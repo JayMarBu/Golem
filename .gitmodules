@@ -1,0 +1,3 @@
+[submodule "Golem/external/spdlog"]
+	path = Golem/external/spdlog
+	url = https://github.com/gabime/spdlog
