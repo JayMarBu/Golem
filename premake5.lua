@@ -18,16 +18,28 @@ project "Golem"
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
+	pchheader "golpch.h"
+	pchsource "Golem/src/golpch.cpp"
+
 	files
 	{
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp"
 	}
 
+	links
+	{
+		"$(VULKAN_SDK)/lib/vulkan-1.lib"
+	}
+
 	includedirs
 	{
-		"%{prj.name}/external/spdlog/include"
+		"$(VULKAN_SDK)/include",
+		"%{prj.name}/external/spdlog/include",
+		"Golem/src"
 	}
+
+
 
 	filter "system:windows"
 		cppdialect "C++17"
@@ -73,12 +85,14 @@ project "Sandbox"
 
 	includedirs
 	{
+		"$(VULKAN_SDK)/include",
 		"Golem/external/spdlog/include",
 		"Golem/src"
 	}
 
 	links
 	{
+		"$(VULKAN_SDK)/lib/vulkan-1.lib",
 		"Golem"
 	}
 

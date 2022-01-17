@@ -9,3 +9,5 @@
 #else
 	#error Golem Only Supports Windows
 #endif
+
+#define BIT(n) (1 << n)
