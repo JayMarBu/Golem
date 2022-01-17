@@ -3,7 +3,7 @@ glfwdir = "../../../Golem/external/glfw/"
 project "GLFW"
 	kind "StaticLib"
 	language "C"
-	staticruntime "off"
+	staticruntime "On"
 	location (glfwdir)
 
 	targetdir ("../../../bin/" .. outputdir .. "/%{prj.name}")
@@ -19,7 +19,20 @@ project "GLFW"
 		(glfwdir.."src/input.c"),
 		(glfwdir.."src/monitor.c"),
 		(glfwdir.."src/vulkan.c"),
-		(glfwdir.."src/window.c")
+		(glfwdir.."src/window.c"),
+		(glfwdir.."src/internal.h"),
+		(glfwdir.."src/platform.h"),
+		(glfwdir.."src/mappings.h"),
+		(glfwdir.."src/platform.c"),
+		(glfwdir.."src/egl_context.c"),
+    	(glfwdir.."src/osmesa_context.c"),
+		(glfwdir.."src/null_platform.h"),
+    	(glfwdir.."src/null_joystick.h"),
+    	(glfwdir.."src/null_init.c"),
+
+    	(glfwdir.."src/null_monitor.c"),
+    	(glfwdir.."src/null_window.c"),
+    	(glfwdir.."src/null_joystick.c"),
 	}
 	filter "system:linux"
 		pic "On"
@@ -51,10 +64,13 @@ project "GLFW"
 		files
 		{
 			(glfwdir.."src/win32_init.c"),
+			(glfwdir.."src/win32_module.c"),
 			(glfwdir.."src/win32_joystick.c"),
 			(glfwdir.."src/win32_monitor.c"),
 			(glfwdir.."src/win32_time.c"),
+			(glfwdir.."src/win32_time.h"),
 			(glfwdir.."src/win32_thread.c"),
+			(glfwdir.."src/win32_thread.h"),
 			(glfwdir.."src/win32_window.c"),
 			(glfwdir.."src/wgl_context.c"),
 			(glfwdir.."src/egl_context.c"),

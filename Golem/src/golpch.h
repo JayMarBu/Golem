@@ -38,3 +38,6 @@ using std::string;
 #include <algorithm>
 #include <initializer_list>
 
+// Vulkan *****************************************************************************************
+#include <vulkan/vulkan.h>
+

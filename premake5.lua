@@ -1,6 +1,6 @@
 workspace "Golem"
 	architecture "x64"
-
+	startproject "Sandbox"
 	configurations
 	{
 		"Debug",

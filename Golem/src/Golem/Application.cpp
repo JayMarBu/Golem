@@ -6,7 +6,7 @@ namespace golem
 
 	Application::Application()
 	{
-
+		m_window = std::unique_ptr<Window>(Window::Create());
 	}
 
 	Application::~Application()
@@ -16,9 +16,9 @@ namespace golem
 
 	void Application::Run()
 	{
-		while(true)
+		while(!m_window->ShouldClose())
 		{
-
+			m_window->OnUpdate();
 		}
 	}
 
