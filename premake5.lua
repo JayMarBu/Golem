@@ -10,6 +10,12 @@ workspace "Golem"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+IncludeDir = {}
+IncludeDir["glfw"] = "Golem/external/glfw/include"
+
+--include "Golem/external/glfw"
+include "external/premake/glfw"
+
 project "Golem"
 	location "Golem"
 	kind "SharedLib"
@@ -28,7 +34,8 @@ project "Golem"
 	}
 
 	links
-	{
+	{	
+		"glfw",
 		"$(VULKAN_SDK)/lib/vulkan-1.lib"
 	}
 
@@ -36,7 +43,8 @@ project "Golem"
 	{
 		"$(VULKAN_SDK)/include",
 		"%{prj.name}/external/spdlog/include",
-		"Golem/src"
+		"Golem/src",
+		"%{IncludeDir.glfw}"
 	}
 
 
