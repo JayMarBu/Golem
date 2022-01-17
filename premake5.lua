@@ -20,6 +20,7 @@ project "Golem"
 	location "Golem"
 	kind "SharedLib"
 	language "C++"
+	staticruntime "Off"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -68,19 +69,23 @@ project "Golem"
 	filter "configurations:Debug"
 		defines "GOL_DEBUG"
 		symbols "On"
+		buildoptions "/MDd"
 
 	filter "configurations:Release"
 		defines "GOL_RELEASE"
 		optimize "On"
+		buildoptions "/MD"
 
 	filter "configurations:Dist"
 		defines "GOL_DIST"
 		optimize "On"
+		buildoptions "/MD"
 
 project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
+	staticruntime "Off"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -117,11 +122,14 @@ project "Sandbox"
 	filter "configurations:Debug"
 		defines "GOL_DEBUG"
 		symbols "On"
+		buildoptions "/MDd"
 
 	filter "configurations:Release"
 		defines "GOL_RELEASE"
 		optimize "On"
+		buildoptions "/MD"
 
 	filter "configurations:Dist"
 		defines "GOL_DIST"
 		optimize "On" 
+		buildoptions "/MD"

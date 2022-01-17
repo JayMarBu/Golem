@@ -14,7 +14,7 @@ namespace golem
 	private:
 		GLFWwindow* m_window;
 
-		struct WindowDate
+		struct WindowData
 		{
 			std::string title;
 			unsigned int width;
@@ -24,7 +24,7 @@ namespace golem
 			EventCallbackFn eventCallback;
 		};
 
-		WindowDate m_data;
+		WindowData m_data;
 
 		// Methods ********************************************************************************
 	public:

@@ -19,3 +19,5 @@
 #endif
 
 #define BIT(n) (1 << n)
+
+#define CLEANUP(x) if(x != NULL) { delete x; x = NULL;}

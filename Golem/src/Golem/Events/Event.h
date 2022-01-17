@@ -43,8 +43,8 @@ namespace golem
 		friend class EventDispatcher;
 
 		// Members ********************************************************************************
-	protected:
-		bool m_handled = false;
+	public:
+		bool Handled = false;
 		// Methods ********************************************************************************
 	public:
 		virtual EventType GetEventType() const = 0;
@@ -80,7 +80,7 @@ namespace golem
 		{
 			if(m_event.GetEventType() == T::GetStaticType())
 			{
-				m_event.m_handled = func(*(T*)&m_event);
+				m_event.Handled = func(*(T*)&m_event);
 				return true;
 			}
 			return false;
