@@ -8,14 +8,14 @@ public:
 	{
 	}
 
-	void OnUpdate() override
+	void OnUpdate(VkCommandBuffer commandBuffer) override
 	{
-		GOL_INFO("ExampleLayer::OnUpdate()");
+		//GOL_INFO("ExampleLayer::OnUpdate()");
 	}
 
 	void OnEvent(golem::Event& event) override
 	{
-		GOL_TRACE("{0}", event.ToString());
+		//GOL_TRACE("{0}", event.ToString());
 	}
 };
 
@@ -25,6 +25,7 @@ public:
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
+		PushOverlay(new golem::ImGuiLayer());
 	}
 
 	~Sandbox()

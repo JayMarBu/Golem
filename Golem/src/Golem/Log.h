@@ -12,6 +12,7 @@ namespace golem
 	private:
 		static std::shared_ptr<spdlog::logger> s_coreLogger;
 		static std::shared_ptr<spdlog::logger> s_clientLogger;
+		static std::shared_ptr<spdlog::logger> s_validationLayerLogger;
 
 		// Methods ********************************************************************************
 	public:
@@ -19,6 +20,7 @@ namespace golem
 
 		inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_coreLogger;}
 		inline static std::shared_ptr<spdlog::logger>& GetCLientLogger() { return s_clientLogger;}
+		inline static std::shared_ptr<spdlog::logger>& GetValidationLayerLogger() { return s_validationLayerLogger;}
 	};
 }
 
@@ -35,3 +37,10 @@ namespace golem
 #define GOL_INFO(...)       ::golem::Log::GetCLientLogger()->info(__VA_ARGS__)
 #define GOL_TRACE(...)      ::golem::Log::GetCLientLogger()->trace(__VA_ARGS__)
 #define GOL_FATAL(...)      ::golem::Log::GetCLientLogger()->fatal(__VA_ARGS__)
+
+// Client Validation Layer Macros *****************************************************************
+#define GOL_VL_ERROR(...)   ::golem::Log::GetValidationLayerLogger()->error(__VA_ARGS__)
+#define GOL_VL_WARN(...)    ::golem::Log::GetValidationLayerLogger()->warn(__VA_ARGS__)
+#define GOL_VL_INFO(...)    ::golem::Log::GetValidationLayerLogger()->info(__VA_ARGS__)
+#define GOL_VL_TRACE(...)   ::golem::Log::GetValidationLayerLogger()->trace(__VA_ARGS__)
+#define GOL_VL_FATAL(...)   ::golem::Log::GetValidationLayerLogger()->fatal(__VA_ARGS__)

@@ -27,7 +27,14 @@ namespace golem
 		using EventCallbackFn = std::function<void(Event&)>;
 
 		// Members ********************************************************************************
-	protected:
+	public:
+		struct WindowExtent
+		{
+			uint32_t width;
+			uint32_t height;
+
+			operator VkExtent2D() const {return {width, height};}
+		};
 
 		// Methods ********************************************************************************
 	public:
@@ -42,8 +49,13 @@ namespace golem
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
 
+		virtual void CreateWindowSurface(VkInstance instance, VkSurfaceKHR* surface) = 0;
 
 		virtual bool ShouldClose() const = 0;
+		virtual bool WasResized() const = 0;
+		virtual void ResetWindowResizedFlag() = 0;
+
+		virtual WindowExtent GetExtent() const = 0;
 
 		static Window* Create(const WindowProps& props = WindowProps());
 	};

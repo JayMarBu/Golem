@@ -12,9 +12,10 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
 IncludeDir["glfw"] = "Golem/external/glfw/include"
+IncludeDir["imgui"] = "Golem/external/imgui"
 
---include "Golem/external/glfw"
 include "external/premake/glfw"
+include "external/premake/imgui"
 
 project "Golem"
 	location "Golem"
@@ -37,6 +38,7 @@ project "Golem"
 	links
 	{	
 		"glfw",
+		"imgui",
 		"$(VULKAN_SDK)/lib/vulkan-1.lib"
 	}
 
@@ -45,7 +47,8 @@ project "Golem"
 		"$(VULKAN_SDK)/include",
 		"%{prj.name}/external/spdlog/include",
 		"Golem/src",
-		"%{IncludeDir.glfw}"
+		"%{IncludeDir.glfw}",
+		"%{IncludeDir.imgui}"
 	}
 
 

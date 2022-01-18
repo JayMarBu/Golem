@@ -20,6 +20,7 @@ namespace golem
 			unsigned int width;
 			unsigned int height;
 			bool VSync;
+			bool frameBufferResized;
 
 			EventCallbackFn eventCallback;
 		};
@@ -41,6 +42,15 @@ namespace golem
 		bool IsVSync() const;
 
 		inline bool ShouldClose() const override{ return glfwWindowShouldClose(m_window); }
+
+		void CreateWindowSurface(VkInstance instance, VkSurfaceKHR* surface) override;
+
+		bool WasResized() const override { return m_data.frameBufferResized;}
+		void ResetWindowResizedFlag() override { m_data.frameBufferResized = false; }
+
+		static GLFWwindow* GetGLFWWindow(Window* window);
+
+		WindowExtent GetExtent() const;
 	private:
 		virtual void Init(const WindowProps& props);
 		virtual void ShutDown();

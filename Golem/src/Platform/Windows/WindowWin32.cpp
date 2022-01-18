@@ -35,7 +35,7 @@ namespace golem
 		m_data.width = props.width;
 		m_data.height = props.height;
 
-		GOL_CORE_INFO("Creating Window {0} ({1}, {2})", m_data.title, m_data.width, m_data.height);
+		GOL_CORE_INFO("Creating Window: \"{0}\" ({1}, {2})", m_data.title, m_data.width, m_data.height);
 
 		if(!s_GLFWInitialized)
 		{
@@ -54,7 +54,18 @@ namespace golem
 		glfwSetWindowUserPointer(m_window,&m_data);
 		SetVSync(true);
 
-		glfwSetWindowSizeCallback(m_window, [](GLFWwindow* window, int width, int height) 
+		glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int w, int h)
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+			data.width = w;
+			data.height = h;
+			data.frameBufferResized = true;
+
+			WindowResizeEvent event(w, h);
+			data.eventCallback(event);
+		});
+
+		/*glfwSetWindowSizeCallback(m_window, [](GLFWwindow* window, int width, int height) 
 		{
 			WindowData& data =  *(WindowData*)glfwGetWindowUserPointer(window);
 
@@ -63,7 +74,7 @@ namespace golem
 
 			WindowResizeEvent event(width, height);
 			data.eventCallback(event);
-		});
+		});*/
 
 		glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window)
 		{
@@ -160,6 +171,21 @@ namespace golem
 		return m_data.VSync;
 	}
 
+	void WindowWin32::CreateWindowSurface(VkInstance instance, VkSurfaceKHR* surface)
+	{
+		auto result = glfwCreateWindowSurface(instance, m_window, nullptr, surface);
+		GOL_CORE_ASSERT(result == VK_SUCCESS ,"failed to create window surface!");
+	}
 
+	GLFWwindow* WindowWin32::GetGLFWWindow(Window* window)
+	{
+		WindowWin32* w = static_cast<WindowWin32*>(window);
+		return w->m_window;
+	}
+
+	golem::Window::WindowExtent WindowWin32::GetExtent() const
+	{
+		return {static_cast<uint32_t>(m_data.width), static_cast<uint32_t>(m_data.height) };
+	}
 
 }
