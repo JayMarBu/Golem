@@ -4,7 +4,7 @@ project "GLFW"
 	kind "StaticLib"
 	language "C"
 	location (glfwdir)
-	staticruntime "On"
+	staticruntime "on"
 
 	targetdir ("../../../bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("../../../bin-int/" .. outputdir .. "/%{prj.name}")
@@ -36,7 +36,6 @@ project "GLFW"
 	}
 
 	filter "system:windows"
-		buildoptions { "-std=c11", "-lgdi32" }
 		systemversion "latest"
 
 		files
@@ -67,9 +66,9 @@ project "GLFW"
 		}
 
 	filter "configurations:Debug"
-		runtime "Debug"
 		symbols "on"
+		runtime "Debug"
 
 	filter "configurations:Release"
-		runtime "Release"
 		optimize "on"
+		runtime "Release"

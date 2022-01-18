@@ -21,7 +21,7 @@ namespace golem
 		}
 	};
 
-	class GOLEM_API Window
+	class Window
 	{
 	public:
 		using EventCallbackFn = std::function<void(Event&)>;

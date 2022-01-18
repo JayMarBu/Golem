@@ -6,7 +6,7 @@
 
 namespace golem
 {
-	class GOLEM_API Log
+	class Log
 	{
 		// Members ********************************************************************************
 	private:

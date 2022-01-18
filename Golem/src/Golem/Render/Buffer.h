@@ -4,7 +4,7 @@
 namespace golem
 {
 
-	class GOLEM_API Buffer {
+	class Buffer {
 		// Members ********************************************************************************
 	private:
 		Device& m_device;

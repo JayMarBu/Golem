@@ -5,7 +5,7 @@
 
 namespace golem
 {
-#define BIND_EVENT_FUNC(x) std::bind(&Application::x, this, std::placeholders::_1) 
+//#define BIND_EVENT_FUNC(x) std::bind(&Application::x, this, std::placeholders::_1) 
 
 	golem::Application* Application::s_instance = nullptr;
 
@@ -15,7 +15,7 @@ namespace golem
 		s_instance = this;
 
 		m_window = std::unique_ptr<Window>(Window::Create());
-		m_window->SetEventCallback(BIND_EVENT_FUNC(OnEvent));
+		m_window->SetEventCallback(BIND_EVENT_FUNC(Application::OnEvent));
 
 		m_device = std::make_unique<Device>(*m_window);
 
@@ -64,7 +64,7 @@ namespace golem
 	{
 		EventDispatcher dispatcher(e);
 
-		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUNC(OnWindowClose));
+		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUNC(Application::OnWindowClose));
 
 		for(auto it = m_layerStack.end(); it != m_layerStack.begin();)
 		{

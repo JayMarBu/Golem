@@ -13,7 +13,7 @@ namespace golem
 		if (err < 0) abort();
 	}
 
-	class GOLEM_API ImGuiLayer : public Layer
+	class ImGuiLayer : public Layer
 	{
 		// Members ********************************************************************************
 	private:

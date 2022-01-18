@@ -4,7 +4,7 @@
 
 namespace golem {
 
-	class GOLEM_API SwapChain {
+	class SwapChain {
 
 		// Members ********************************************************************************
 	public:

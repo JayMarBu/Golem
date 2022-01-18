@@ -4,7 +4,7 @@
 
 namespace golem
 {
-	class GOLEM_API Input
+	class Input
 	{
 		// Members ********************************************************************************
 	private:

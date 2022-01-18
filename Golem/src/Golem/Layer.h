@@ -5,7 +5,7 @@
 
 namespace golem
 {
-	class GOLEM_API Layer
+	class Layer
 	{
 		// Members ********************************************************************************
 	protected:

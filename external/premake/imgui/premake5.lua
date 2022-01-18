@@ -3,6 +3,7 @@ imguidir = "../../../Golem/external/imgui/"
 project "ImGui"
 	kind "StaticLib"
 	language "C++"
+	cppdialect "C++17"
     staticruntime "on"
 	location(imguidir)
 
@@ -21,22 +22,16 @@ project "ImGui"
 		(imguidir.."imstb_rectpack.h"),
 		(imguidir.."imstb_textedit.h"),
 		(imguidir.."imstb_truetype.h"),
-		(imguidir.."imgui_demo.cpp")--,
+		(imguidir.."imgui_demo.cpp")
+	}
 
-		--(imguidir.."backends/imgui_impl_vulkan.h"),
-		--(imguidir.."backends/imgui_impl_vulkan.cpp"),
-		--(imguidir.."backends/imgui_impl_glfw.h"),
-		--(imguidir.."backends/imgui_impl_glfw.cpp")
+	defines 
+	{ 
+		"_CRT_SECURE_NO_WARNINGS"
 	}
 
 	filter "system:windows"
 		systemversion "latest"
-		cppdialect "C++17"
-
-	filter "system:linux"
-		pic "On"
-		systemversion "latest"
-		cppdialect "C++17"
 
 	filter "configurations:Debug"
 		runtime "Debug"

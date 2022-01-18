@@ -9,7 +9,7 @@
 
 namespace golem
 {
-	class GOLEM_API Application
+	class Application
 	{
 		// Members ********************************************************************************
 	protected:

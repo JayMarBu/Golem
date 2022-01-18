@@ -4,7 +4,7 @@
 
 namespace JEngine
 {
-	struct GOLEM_API FrameInfo
+	struct FrameInfo
 	{
 		int frameIndex;
 		float frameTime;

@@ -28,11 +28,11 @@ namespace golem
 			{
 				// block imgui viewport error from showing... definitely need to have another
 				// try at fixing it at some point. not gonna do that right now though
-				const char* str1 = pCallbackData->pMessage;
-				const char* ptr = strstr(str1, "Validation Error: [ VUID-vkCmdDrawIndexed-renderPass-02684 ]");
+				//const char* str1 = pCallbackData->pMessage;
+				//const char* ptr = strstr(str1, "Validation Error: [ VUID-vkCmdDrawIndexed-renderPass-02684 ]");
 				// -----
-				if (str1 == ptr)
-					return VK_FALSE;
+				//if (str1 == ptr)
+				//	return VK_FALSE;
 				GOL_VL_ERROR("{0}", pCallbackData->pMessage);
 			}
 			break;

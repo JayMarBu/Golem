@@ -18,7 +18,7 @@ namespace golem {
 		bool isComplete() { return graphicsFamilyHasValue && presentFamilyHasValue; }
 	};
 
-	class GOLEM_API Device {
+	class Device {
 
 		// Members **************************************************************************************
 	public:

@@ -6,12 +6,12 @@ namespace golem
 	// ******************************************************************************************//
 	// Descriptor set layout class																 //
 	// ******************************************************************************************//
-	class GOLEM_API DescriptorSetLayout
+	class DescriptorSetLayout
 	{
 		// Members ********************************************************************************
 	public:
 
-		class GOLEM_API Builder
+		class Builder
 		{
 		private:
 			Device& m_device;
@@ -50,12 +50,12 @@ namespace golem
 	// ******************************************************************************************//
 	// Descriptor pool class																	 //
 	// ******************************************************************************************//
-	class GOLEM_API DescriptorPool
+	class DescriptorPool
 	{
 		// Members ********************************************************************************
 	public:
 
-		class GOLEM_API Builder
+		class Builder
 		{
 		private:
 			Device& m_device;
@@ -101,7 +101,7 @@ namespace golem
 	// ******************************************************************************************//
 	// Descriptor writer class																	 //
 	// ******************************************************************************************//
-	class GOLEM_API DescriptorWriter
+	class DescriptorWriter
 	{
 		// Members ********************************************************************************
 	private:

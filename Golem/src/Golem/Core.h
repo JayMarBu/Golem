@@ -1,15 +1,5 @@
 #pragma once
 
-#ifdef GOL_PLATFORM_WINDOWS
-	#ifdef GOL_BUILD_DLL
-		#define GOLEM_API __declspec(dllexport)
-	#else
-		#define GOLEM_API __declspec(dllimport)
-	#endif
-#else
-	#error Golem Only Supports Windows
-#endif
-
 #ifdef GOL_DEBUG
 	#define GOL_ENABLE_ASSERTS
 #endif

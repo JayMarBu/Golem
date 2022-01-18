@@ -7,7 +7,7 @@ namespace golem
 	// ********************************************************************************************//
 	//									Mouse Moved Event Class									   //
 	// ********************************************************************************************//
-	class GOLEM_API MouseMovedEvent : public Event
+	class MouseMovedEvent : public Event
 	{
 		// Members ********************************************************************************
 	private:
@@ -34,7 +34,7 @@ namespace golem
 	// ********************************************************************************************//
 	//								 Mouse Scrolled Event Class									   //
 	// ********************************************************************************************//
-	class GOLEM_API MouseScrolledEvent : public Event
+	class MouseScrolledEvent : public Event
 	{
 		// Members ********************************************************************************
 	private:
@@ -61,7 +61,7 @@ namespace golem
 	// ********************************************************************************************//
 	//								 Mouse Button Event Class									   //
 	// ********************************************************************************************//
-	class GOLEM_API MouseButtonEvent : public Event
+	class MouseButtonEvent : public Event
 	{
 		// Members ********************************************************************************
 	protected:
@@ -72,7 +72,7 @@ namespace golem
 			: m_button(button) {}
 
 	public:
-		inline float GetMouseButton() const { return m_button; }
+		inline int GetMouseButton() const { return m_button; }
 
 		EVENT_CLASS_CATEGORY(EventCategory_Input | EventCategory_Mouse)
 	};
@@ -80,7 +80,7 @@ namespace golem
 	// ********************************************************************************************//
 	//								Mouse Button Pressed Event Class							   //
 	// ********************************************************************************************//
-	class GOLEM_API MouseButtonPressedEvent : public MouseButtonEvent
+	class MouseButtonPressedEvent : public MouseButtonEvent
 	{
 		// Members ********************************************************************************
 	private:
@@ -102,7 +102,7 @@ namespace golem
 	// ********************************************************************************************//
 	//								Mouse Button Released Event Class							   //
 	// ********************************************************************************************//
-	class GOLEM_API MouseButtonReleasedEvent : public MouseButtonEvent
+	class MouseButtonReleasedEvent : public MouseButtonEvent
 	{
 		// Members ********************************************************************************
 	private:
