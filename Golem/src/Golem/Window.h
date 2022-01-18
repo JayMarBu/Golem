@@ -55,6 +55,8 @@ namespace golem
 		virtual bool WasResized() const = 0;
 		virtual void ResetWindowResizedFlag() = 0;
 
+		virtual void* GetNativeWindow() const = 0;
+
 		virtual WindowExtent GetExtent() const = 0;
 
 		static Window* Create(const WindowProps& props = WindowProps());

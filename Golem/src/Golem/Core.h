@@ -10,6 +10,10 @@
 	#error Golem Only Supports Windows
 #endif
 
+#ifdef GOL_DEBUG
+	#define GOL_ENABLE_ASSERTS
+#endif
+
 #ifdef GOL_ENABLE_ASSERTS
 	#define GOL_ASSERT(x, ...) {if(!(x)) { GOL_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak();}}
 	#define GOL_CORE_ASSERT(x, ...) {if(!(x)) { GOL_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak();}}

@@ -1,0 +1,14 @@
+#pragma once
+
+#define GOL_MOUSE_BUTTON_1         0
+#define GOL_MOUSE_BUTTON_2         1
+#define GOL_MOUSE_BUTTON_3         2
+#define GOL_MOUSE_BUTTON_4         3
+#define GOL_MOUSE_BUTTON_5         4
+#define GOL_MOUSE_BUTTON_6         5
+#define GOL_MOUSE_BUTTON_7         6
+#define GOL_MOUSE_BUTTON_8         7
+#define GOL_MOUSE_BUTTON_LAST      GOL_MOUSE_BUTTON_8
+#define GOL_MOUSE_BUTTON_LEFT      GOL_MOUSE_BUTTON_1
+#define GOL_MOUSE_BUTTON_RIGHT     GOL_MOUSE_BUTTON_2
+#define GOL_MOUSE_BUTTON_MIDDLE    GOL_MOUSE_BUTTON_3

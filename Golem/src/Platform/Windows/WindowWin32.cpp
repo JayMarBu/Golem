@@ -184,12 +184,6 @@ namespace golem
 		GOL_CORE_ASSERT(result == VK_SUCCESS ,"failed to create window surface!");
 	}
 
-	GLFWwindow* WindowWin32::GetGLFWWindow(Window* window)
-	{
-		WindowWin32* w = static_cast<WindowWin32*>(window);
-		return w->m_window;
-	}
-
 	golem::Window::WindowExtent WindowWin32::GetExtent() const
 	{
 		return {static_cast<uint32_t>(m_data.width), static_cast<uint32_t>(m_data.height) };

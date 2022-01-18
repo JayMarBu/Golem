@@ -26,29 +26,21 @@ namespace golem
 		auto& device = Application::Get().GetDevice();
 		auto& window = Application::Get().GetWindow();
 
-		// set up a descriptor pool stored on this instance, see header for more comments on this.
-		VkDescriptorPoolSize pool_sizes[] = {
-			{VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
-			{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
-			{VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000},
-			{VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000},
-			{VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000},
-			{VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000},
-			{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000},
-			{VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000},
-			{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000},
-			{VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000},
-			{VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000} };
-		VkDescriptorPoolCreateInfo pool_info = {};
-		pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-		pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-		pool_info.maxSets = 1000 * IM_ARRAYSIZE(pool_sizes);
-		pool_info.poolSizeCount = (uint32_t)IM_ARRAYSIZE(pool_sizes);
-		pool_info.pPoolSizes = pool_sizes;
-		if (vkCreateDescriptorPool(device.device(), &pool_info, nullptr, &m_descriptorPool) != VK_SUCCESS)
-		{
-			throw std::runtime_error("failed to set up descriptor pool for imgui");
-		}
+		m_descriptorPool = DescriptorPool::Builder(device)
+			.AddPoolSize(VK_DESCRIPTOR_TYPE_SAMPLER, 1000 )
+			.AddPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 )
+			.AddPoolSize(VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 )
+			.AddPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 )
+			.AddPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 )
+			.AddPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 )
+			.AddPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 )
+			.AddPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 )
+			.AddPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 )
+			.AddPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 )
+			.AddPoolSize(VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 )
+			.SetPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
+			.SetMaxSets(1000 * 11)
+			.build();
 
 		// Setup Dear ImGui context
 		IMGUI_CHECKVERSION();
@@ -83,7 +75,7 @@ namespace golem
 
 		// Setup Platform/Renderer backends
 		// Initialize imgui for vulkan
-		ImGui_ImplGlfw_InitForVulkan( WindowWin32::GetGLFWWindow(&window), false);
+		ImGui_ImplGlfw_InitForVulkan( static_cast<GLFWwindow*>(window.GetNativeWindow()), false);
 		ImGui_ImplVulkan_InitInfo init_info = {};
 		init_info.Instance = device.instance();
 		init_info.PhysicalDevice = device.physicalDevice();
@@ -93,7 +85,7 @@ namespace golem
 
 		// pipeline cache is a potential future optimization, ignoring for now
 		init_info.PipelineCache = VK_NULL_HANDLE;
-		init_info.DescriptorPool = m_descriptorPool;
+		init_info.DescriptorPool = m_descriptorPool->GetVKDescriptorPool();
 		// todo, I should probably get around to integrating a memory allocator library such as Vulkan
 		// memory allocator (VMA) sooner than later. We don't want to have to update adding an allocator
 		// in a ton of locations.
@@ -104,7 +96,7 @@ namespace golem
 		ImGui_ImplVulkan_Init(&init_info, Application::Get().GetRenderer().GetSwapChainRenderPass());
 
 		// upload fonts, this is done by recording and submitting a one time use command buffer
-		// which can be done easily bye using some existing helper functions on the golem device object
+		// which can be done easily by using some existing helper functions on the golem device object
 		auto commandBuffer = device.BeginSingleTimeCommands();
 		ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
 		device.EndSingleTimeCommands(commandBuffer);
@@ -115,7 +107,7 @@ namespace golem
 	{
 		auto& device = Application::Get().GetDevice();
 
-		vkDestroyDescriptorPool(device.device(), m_descriptorPool, nullptr);
+		//vkDestroyDescriptorPool(device.device(), m_descriptorPool, nullptr);
 		ImGui_ImplVulkan_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
@@ -214,9 +206,6 @@ namespace golem
 		io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT]	|| io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
 		io.KeyAlt	= io.KeysDown[GLFW_KEY_LEFT_ALT]	|| io.KeysDown[GLFW_KEY_RIGHT_ALT];
 		io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER]	|| io.KeysDown[GLFW_KEY_RIGHT_SUPER];
-
-		//if(e.GetKeyCode() == GLFW_KEY_BACKSPACE)
-		//	io.AddInputCharacter(GLFW_KEY_BACKSPACE);
 
 		return io.WantCaptureKeyboard;
 	}

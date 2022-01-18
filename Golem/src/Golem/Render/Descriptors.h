@@ -6,12 +6,12 @@ namespace golem
 	// ******************************************************************************************//
 	// Descriptor set layout class																 //
 	// ******************************************************************************************//
-	class DescriptorSetLayout
+	class GOLEM_API DescriptorSetLayout
 	{
 		// Members ********************************************************************************
 	public:
 
-		class Builder
+		class GOLEM_API Builder
 		{
 		private:
 			Device& m_device;
@@ -50,12 +50,12 @@ namespace golem
 	// ******************************************************************************************//
 	// Descriptor pool class																	 //
 	// ******************************************************************************************//
-	class DescriptorPool
+	class GOLEM_API DescriptorPool
 	{
 		// Members ********************************************************************************
 	public:
 
-		class Builder
+		class GOLEM_API Builder
 		{
 		private:
 			Device& m_device;
@@ -89,6 +89,8 @@ namespace golem
 
 		REMOVE_COPY_CONSTRUCTOR(DescriptorPool);
 
+		inline VkDescriptorPool GetVKDescriptorPool() {return m_descriptorPool;}
+
 		bool AllocateDescriptor(const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptor) const;
 
 		void FreeDescriptors(std::vector<VkDescriptorSet>& descriptors) const;
@@ -99,7 +101,7 @@ namespace golem
 	// ******************************************************************************************//
 	// Descriptor writer class																	 //
 	// ******************************************************************************************//
-	class DescriptorWriter
+	class GOLEM_API DescriptorWriter
 	{
 		// Members ********************************************************************************
 	private:

@@ -37,18 +37,18 @@ namespace golem
 		inline unsigned int GetWidth() const override {return m_data.width;}
 		inline unsigned int GetHeight() const override {return m_data.height;}
 
-		inline void SetEventCallback(const EventCallbackFn& callback) override {m_data.eventCallback = callback;}
-		void SetVSync(bool enabled);
-		bool IsVSync() const;
+		inline virtual void SetEventCallback(const EventCallbackFn& callback) override {m_data.eventCallback = callback;}
+		virtual void SetVSync(bool enabled);
+		virtual bool IsVSync() const;
 
-		inline bool ShouldClose() const override{ return glfwWindowShouldClose(m_window); }
+		inline virtual bool ShouldClose() const override{ return glfwWindowShouldClose(m_window); }
 
-		void CreateWindowSurface(VkInstance instance, VkSurfaceKHR* surface) override;
+		virtual void CreateWindowSurface(VkInstance instance, VkSurfaceKHR* surface) override;
 
-		bool WasResized() const override { return m_data.frameBufferResized;}
-		void ResetWindowResizedFlag() override { m_data.frameBufferResized = false; }
+		virtual bool WasResized() const override { return m_data.frameBufferResized;}
+		virtual void ResetWindowResizedFlag() override { m_data.frameBufferResized = false; }
 
-		static GLFWwindow* GetGLFWWindow(Window* window);
+		inline virtual void* GetNativeWindow() const { return m_window; };
 
 		WindowExtent GetExtent() const;
 	private:

@@ -59,6 +59,7 @@ namespace golem
 
 		for(auto it = m_layerStack.end(); it != m_layerStack.begin();)
 		{
+			
 			(*--it)->OnEvent(e);
 			if(e.Handled)
 				break;

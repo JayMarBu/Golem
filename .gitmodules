@@ -8,3 +8,6 @@
 	path = Golem/external/imgui
 	url = https://github.com/ocornut/imgui
 	branch = docking
+[submodule "Golem/external/glm"]
+	path = Golem/external/glm
+	url = https://github.com/g-truc/glm

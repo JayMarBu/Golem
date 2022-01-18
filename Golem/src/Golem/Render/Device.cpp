@@ -572,8 +572,8 @@ namespace golem
 		// allocate buffer memory
 		SAFE_RUN_VULKAN_FUNC(vkAllocateMemory(m_device, &allocInfo, nullptr, &bufferMemory), "failed to allocate vertex buffer memory!")
 
-			// bind buffer to memory location
-			vkBindBufferMemory(m_device, buffer, bufferMemory, 0);
+		// bind buffer to memory location
+		vkBindBufferMemory(m_device, buffer, bufferMemory, 0);
 	}
 
 	VkCommandBuffer Device::BeginSingleTimeCommands()

@@ -3,6 +3,7 @@
 #include "../Events/MouseEvent.h"
 #include "../Events/KeyEvent.h"
 #include "../Events/ApplicationEvent.h"
+#include "../Render/Descriptors.h"
 
 namespace golem
 {
@@ -16,8 +17,10 @@ namespace golem
 	{
 		// Members ********************************************************************************
 	private:
+		
+		std::unique_ptr<DescriptorPool> m_descriptorPool;
 
-		VkDescriptorPool m_descriptorPool;
+		//VkDescriptorPool m_descriptorPool;
 		// Methods ********************************************************************************
 	public:
 		ImGuiLayer();

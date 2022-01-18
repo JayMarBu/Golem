@@ -10,13 +10,13 @@ public:
 
 	void OnUpdate(VkCommandBuffer commandBuffer) override
 	{
-		//GOL_INFO("ExampleLayer::OnUpdate()");
+
 	}
 
-	void OnEvent(golem::Event& event) override
+	void OnEvent(golem::Event& e) override
 	{
-		if(event.GetEventType() != golem::EventType::MouseMoved)
-			GOL_TRACE("{0}", event.ToString());
+		if(e.GetEventType() != golem::EventType::MouseMoved)
+			GOL_TRACE("{0}", e.ToString());
 	}
 };
 
