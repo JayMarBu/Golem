@@ -15,7 +15,8 @@ public:
 
 	void OnEvent(golem::Event& event) override
 	{
-		//GOL_TRACE("{0}", event.ToString());
+		if(event.GetEventType() != golem::EventType::MouseMoved)
+			GOL_TRACE("{0}", event.ToString());
 	}
 };
 

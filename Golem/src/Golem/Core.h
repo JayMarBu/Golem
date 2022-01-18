@@ -11,14 +11,16 @@
 #endif
 
 #ifdef GOL_ENABLE_ASSERTS
-	#define GOL_ASSERT(x, ...) {if(!x) { GOL_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak();}}
-	#define GOL_CORE_ASSERT(x, ...) {if(!x) { GOL_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak();}}
+	#define GOL_ASSERT(x, ...) {if(!(x)) { GOL_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak();}}
+	#define GOL_CORE_ASSERT(x, ...) {if(!(x)) { GOL_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak();}}
 #else
 	#define GOL_ASSERT(x, ...)
 	#define GOL_CORE_ASSERT(x, ...)
 #endif
 
 #define BIT(n) (1 << n)
+
+#define BIND_EVENT_FUNC(func) std::bind(&func, this, std::placeholders::_1)
 
 #define CLEANUP(x) if(x != NULL) { delete x; x = NULL;}
 

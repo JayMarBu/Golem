@@ -73,6 +73,7 @@ project "Golem"
 		defines "GOL_DEBUG"
 		symbols "On"
 		buildoptions "/MDd"
+		defines "GOL_ENABLE_ASSERTS"
 
 	filter "configurations:Release"
 		defines "GOL_RELEASE"

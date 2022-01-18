@@ -11,7 +11,7 @@ namespace golem
 
 	Application::Application()
 	{
-		GOL_ASSERT(s_instance == nullptr, "Application already exists!");
+		GOL_CORE_ASSERT(s_instance == nullptr, "Application already exists!");
 		s_instance = this;
 
 		m_window = std::unique_ptr<Window>(Window::Create());
@@ -54,8 +54,8 @@ namespace golem
 
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUNC(OnWindowClose));
 
-		if(e.GetEventType() != EventType::MouseMoved)
-			GOL_CORE_TRACE("{0}",e.ToString());
+		//if(e.GetEventType() != EventType::MouseMoved)
+		//	GOL_CORE_TRACE("{0}",e.ToString());
 
 		for(auto it = m_layerStack.end(); it != m_layerStack.begin();)
 		{
