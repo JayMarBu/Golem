@@ -372,7 +372,41 @@ namespace golem {
 
 	VkSurfaceFormatKHR SwapChain::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
 	{
-		for (const auto& availableFormat : availableFormats)
+		const VkFormat requestSurfaceImageFormat[] = { VK_FORMAT_B8G8R8A8_SRGB, VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_R8G8B8A8_UNORM, VK_FORMAT_B8G8R8_UNORM, VK_FORMAT_R8G8B8_UNORM };
+		const VkColorSpaceKHR requestSurfaceColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
+
+		uint32_t avail_count = availableFormats.size();
+		//(size_t)
+		int request_formats_count = ((int)(sizeof(requestSurfaceImageFormat) / sizeof(*(requestSurfaceImageFormat))));
+
+		if (avail_count == 1)
+		{
+			if (availableFormats[0].format == VK_FORMAT_UNDEFINED)
+			{
+				VkSurfaceFormatKHR ret;
+				ret.format = requestSurfaceImageFormat[0];
+				ret.colorSpace = requestSurfaceColorSpace;
+				return ret;
+			}
+			else
+			{
+				// No point in searching another format
+				return availableFormats[0];
+			}
+		}
+		else
+		{
+			// Request several formats, the first found will be used
+			for (int request_i = 0; request_i < request_formats_count; request_i++)
+				for (uint32_t avail_i = 0; avail_i < avail_count; avail_i++)
+					if (availableFormats[avail_i].format == requestSurfaceImageFormat[request_i] && availableFormats[avail_i].colorSpace == requestSurfaceColorSpace)
+						return availableFormats[avail_i];
+
+			// If none of the requested image formats could be found, use the first available
+			return availableFormats[0];
+		}
+
+		/*for (const auto& availableFormat : availableFormats)
 		{
 			if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
 				availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
@@ -381,7 +415,7 @@ namespace golem {
 			}
 		}
 
-		return availableFormats[0];
+		return availableFormats[0];*/
 	}
 
 	VkPresentModeKHR SwapChain::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes)

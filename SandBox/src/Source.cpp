@@ -1,4 +1,5 @@
 #include "Golem.h"
+#include "ImGui/imgui.h"
 
 class ExampleLayer : public golem::Layer
 {
@@ -8,9 +9,15 @@ public:
 	{
 	}
 
-	void OnUpdate(VkCommandBuffer commandBuffer) override
+	void OnUpdate() override
 	{
 
+	}
+
+	void OnImGuiRender() override
+	{
+		//ImGui::Begin("test");
+		//ImGui::End();
 	}
 
 	void OnEvent(golem::Event& e) override
@@ -26,7 +33,7 @@ public:
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
-		PushOverlay(new golem::ImGuiLayer());
+		//PushOverlay(new golem::ImGuiLayer());
 	}
 
 	~Sandbox()

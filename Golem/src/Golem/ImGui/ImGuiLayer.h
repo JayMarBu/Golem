@@ -28,11 +28,11 @@ namespace golem
 
 		void OnAttach() override;
 		void OnDetach() override;
-		void OnUpdate(VkCommandBuffer commandBuffer) override;
 		void OnEvent(Event& e) override;
+		void OnImGuiRender() override;
 
-		void NewFrame();
-		void Render(VkCommandBuffer commandBuffer);
+		void Begin();
+		void End(VkCommandBuffer commandBuffer);
 	private: 
 		bool OnMouseButtonPressedEvent(MouseButtonPressedEvent& e);
 		bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& e);
@@ -43,8 +43,5 @@ namespace golem
 		bool OnKeyReleasedEvent(KeyReleasedEvent& e);
 
 		bool OnKeyTypedEvent(KeyTypedEvent& e);
-
-		bool OnWindowResizedEvent(WindowResizeEvent& e);
-
 	};
 }

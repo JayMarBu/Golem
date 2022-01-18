@@ -66,6 +66,7 @@ project "Golem"
 		{
 			"GOL_PLATFORM_WINDOWS",
 			"GOL_BUILD_DLL",
+			"GLFW_INCLUDE_NONE",
 			"WIN32_LEAN_AND_MEAN",
 			"NOMINMAX"
 		}
@@ -110,13 +111,15 @@ project "Sandbox"
 		"$(VULKAN_SDK)/include",
 		"Golem/external/spdlog/include",
 		"Golem/src",
+		"Golem/external",
 		"%{IncludeDir.glm}"
 	}
 
 	links
 	{
 		"$(VULKAN_SDK)/lib/vulkan-1.lib",
-		"Golem"
+		"Golem",
+		"imgui"
 	}
 
 	filter "system:windows"

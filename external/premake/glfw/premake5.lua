@@ -3,8 +3,8 @@ glfwdir = "../../../Golem/external/glfw/"
 project "GLFW"
 	kind "StaticLib"
 	language "C"
-	staticruntime "on"
 	location (glfwdir)
+	staticruntime "On"
 
 	targetdir ("../../../bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("../../../bin-int/" .. outputdir .. "/%{prj.name}")
@@ -34,31 +34,9 @@ project "GLFW"
     	(glfwdir.."src/null_window.c"),
     	(glfwdir.."src/null_joystick.c"),
 	}
-	filter "system:linux"
-		pic "On"
-
-		systemversion "latest"
-		
-		files
-		{
-			(glfwdir.."src/x11_init.c"),
-			(glfwdir.."src/x11_monitor.c"),
-			(glfwdir.."src/x11_window.c"),
-			(glfwdir.."src/xkb_unicode.c"),
-			(glfwdir.."src/posix_time.c"),
-			(glfwdir.."src/posix_thread.c"),
-			(glfwdir.."src/glx_context.c"),
-			(glfwdir.."src/egl_context.c"),
-			(glfwdir.."src/osmesa_context.c"),
-			(glfwdir.."src/linux_joystick.c")
-		}
-
-		defines
-		{
-			"_GLFW_X11"
-		}
 
 	filter "system:windows"
+		buildoptions { "-std=c11", "-lgdi32" }
 		systemversion "latest"
 
 		files

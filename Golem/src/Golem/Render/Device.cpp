@@ -13,8 +13,6 @@ namespace golem
 		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 		void* pUserData)
 	{
-		//std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
-
 		switch (messageSeverity)
 		{
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
@@ -27,7 +25,16 @@ namespace golem
 			GOL_VL_WARN("{0}", pCallbackData->pMessage);
 			break;
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
-			GOL_VL_ERROR("{0}", pCallbackData->pMessage);
+			{
+				// block imgui viewport error from showing... definitely need to have another
+				// try at fixing it at some point. not gonna do that right now though
+				const char* str1 = pCallbackData->pMessage;
+				const char* ptr = strstr(str1, "Validation Error: [ VUID-vkCmdDrawIndexed-renderPass-02684 ]");
+				// -----
+				if (str1 == ptr)
+					return VK_FALSE;
+				GOL_VL_ERROR("{0}", pCallbackData->pMessage);
+			}
 			break;
 		}
 

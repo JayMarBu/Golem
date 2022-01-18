@@ -14,8 +14,8 @@ namespace golem
 		unsigned int height;
 
 		WindowProps(const std::string& _title = "Golem App",	
-					unsigned int _width = 1200,
-					unsigned int _height = 700)
+					unsigned int _width = 1600,
+					unsigned int _height = 900)
 			: title{_title}, width{_width}, height{_height}
 		{
 		}

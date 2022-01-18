@@ -2,8 +2,8 @@
 #include "ImGuiLayer.h"
 
 #include "imgui.h"
-#include "Platform/Vulkan/imgui_impl_vulkan.h"
-#include "Platform/Vulkan/imgui_impl_glfw.h"
+#include "backends/imgui_impl_vulkan.h"
+#include "backends/imgui_impl_glfw.h"
 #include "GLFW/glfw3.h"
 #include "Platform/Windows/WindowWin32.h"
 #include "../Application.h"
@@ -18,7 +18,8 @@ namespace golem
 
 	ImGuiLayer::~ImGuiLayer()
 	{
-		OnDetach();
+		if(m_attached)
+			OnDetach();
 	}
 
 	void ImGuiLayer::OnAttach()
@@ -48,10 +49,12 @@ namespace golem
 		ImGui::StyleColorsDark();
 		ImGuiIO& io = ImGui::GetIO();
 		(void)io;
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		// io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 		// io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-		io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
+		/*io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
 		io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
 		io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
 		io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
@@ -71,11 +74,11 @@ namespace golem
 		io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
 		io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
 		io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
-		io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
+		io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;*/
 
 		// Setup Platform/Renderer backends
 		// Initialize imgui for vulkan
-		ImGui_ImplGlfw_InitForVulkan( static_cast<GLFWwindow*>(window.GetNativeWindow()), false);
+		ImGui_ImplGlfw_InitForVulkan( static_cast<GLFWwindow*>(window.GetNativeWindow()), true);
 		ImGui_ImplVulkan_InitInfo init_info = {};
 		init_info.Instance = device.instance();
 		init_info.PhysicalDevice = device.physicalDevice();
@@ -107,21 +110,9 @@ namespace golem
 	{
 		auto& device = Application::Get().GetDevice();
 
-		//vkDestroyDescriptorPool(device.device(), m_descriptorPool, nullptr);
 		ImGui_ImplVulkan_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
-	}
-
-	void ImGuiLayer::OnUpdate(VkCommandBuffer commandBuffer)
-	{
-		NewFrame();
-
-		bool open = true;
-
-		ImGui::ShowDemoWindow(&open);
-
-		Render(commandBuffer);
 	}
 
 	void ImGuiLayer::OnEvent(Event& e)
@@ -135,10 +126,15 @@ namespace golem
 		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FUNC(ImGuiLayer::OnKeyPressedEvent));
 		dispatcher.Dispatch<KeyReleasedEvent>(BIND_EVENT_FUNC(ImGuiLayer::OnKeyReleasedEvent));
 		dispatcher.Dispatch<KeyTypedEvent>(BIND_EVENT_FUNC(ImGuiLayer::OnKeyTypedEvent));
-		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FUNC(ImGuiLayer::OnWindowResizedEvent));
 	}
 
-	void ImGuiLayer::NewFrame()
+	void ImGuiLayer::OnImGuiRender()
+	{
+		static bool open = true;
+		ImGui::ShowDemoWindow(&open);
+	}
+
+	void ImGuiLayer::Begin()
 	{
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -146,7 +142,7 @@ namespace golem
 
 	}
 
-	void ImGuiLayer::Render(VkCommandBuffer commandBuffer)
+	void ImGuiLayer::End(VkCommandBuffer commandBuffer)
 	{
 		ImGui::Render();
 		ImDrawData* drawdata = ImGui::GetDrawData();
@@ -156,83 +152,43 @@ namespace golem
 	bool ImGuiLayer::OnMouseButtonPressedEvent(MouseButtonPressedEvent& e)
 	{
 		ImGuiIO& io = ImGui::GetIO();
-
-		if (e.GetMouseButton() >= 0 && e.GetMouseButton() < ImGuiMouseButton_COUNT)
-			io.AddMouseButtonEvent(e.GetMouseButton(), GLFW_PRESS);
-
 		return io.WantCaptureMouse;
 	}
 
 	bool ImGuiLayer::OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& e)
 	{
 		ImGuiIO& io = ImGui::GetIO();
-
-		if (e.GetMouseButton() >= 0 && e.GetMouseButton() < ImGuiMouseButton_COUNT)
-			io.AddMouseButtonEvent(e.GetMouseButton(), GLFW_RELEASE);
-
 		return io.WantCaptureMouse;
 	}
 
 	bool ImGuiLayer::OnMouseMovedEvent(MouseMovedEvent& e)
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		/*if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-		{
-			int window_x, window_y;
-			glfwGetWindowPos(window, &window_x, &window_y);
-			x += window_x;
-			y += window_y;
-		}*/
-		io.AddMousePosEvent((float)e.GetX(), e.GetY());
-
 		return io.WantCaptureMouse;
 	}
 
 	bool ImGuiLayer::OnMouseScrollEvent(MouseScrolledEvent& e)
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		io.MouseWheel += e.GetYOffset();
-		io.MouseWheelH += e.GetXOffset();
-
 		return io.WantCaptureMouse;
 	}
 
 	bool ImGuiLayer::OnKeyPressedEvent(KeyPressedEvent& e)
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		io.KeysDown[e.GetKeyCode()] = true;
-
-		io.KeyCtrl	= io.KeysDown[GLFW_KEY_LEFT_CONTROL]|| io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
-		io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT]	|| io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
-		io.KeyAlt	= io.KeysDown[GLFW_KEY_LEFT_ALT]	|| io.KeysDown[GLFW_KEY_RIGHT_ALT];
-		io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER]	|| io.KeysDown[GLFW_KEY_RIGHT_SUPER];
-
 		return io.WantCaptureKeyboard;
 	}
 
 	bool ImGuiLayer::OnKeyReleasedEvent(KeyReleasedEvent& e)
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		io.KeysDown[e.GetKeyCode()] = false;
-
 		return io.WantCaptureKeyboard;
 	}
 
 	bool ImGuiLayer::OnKeyTypedEvent(KeyTypedEvent& e)
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		if(e.GetKeyCode() > 0 && e.GetKeyCode() < 0x10000)
-			io.AddInputCharacter(e.GetKeyCode());
-
 		return io.WantCaptureKeyboard;
-	}
-
-	bool ImGuiLayer::OnWindowResizedEvent(WindowResizeEvent& e)
-	{
-		ImGuiIO& io = ImGui::GetIO();
-		io.DisplaySize = ImVec2(e.GetWidth(), e.GetHeight());
-		io.DisplayFramebufferScale = ImVec2(1.0f,1.0f);
-		return true;
 	}
 
 }

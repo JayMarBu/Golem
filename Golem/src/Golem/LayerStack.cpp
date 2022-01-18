@@ -6,7 +6,6 @@ namespace golem
 
 	LayerStack::LayerStack()
 	{
-		m_layerInsert = m_layers.begin();
 	}
 
 	LayerStack::~LayerStack()
@@ -19,14 +18,17 @@ namespace golem
 
 	void LayerStack::PushLayer(Layer* layer)
 	{
-		m_layerInsert = m_layers.emplace(m_layerInsert, layer);
+		m_layers.emplace(m_layers.begin() + m_layerInsertIndex, layer);
+		m_layerInsertIndex++;
 		layer->OnAttach();
+		layer->SetAttached(true);
 	}
 
 	void LayerStack::PushOverlay(Layer* overlay)
 	{
 		m_layers.emplace_back(overlay);
 		overlay->OnAttach();
+		overlay->SetAttached(true);
 	}
 
 	void LayerStack::PopLayer(Layer* layer)
@@ -34,9 +36,10 @@ namespace golem
 		auto it = std::find(m_layers.begin(), m_layers.end(), layer);
 		if(it != m_layers.end())
 		{
-			
+			layer->SetAttached(false);
+			layer->OnDetach();
 			m_layers.erase(it);
-			m_layerInsert--;
+			m_layerInsertIndex--;
 		}
 	}
 
@@ -44,7 +47,11 @@ namespace golem
 	{
 		auto it = std::find(m_layers.begin(), m_layers.end(), overlay);
 		if(it != m_layers.end())
+		{
+			overlay->SetAttached(false);
+			overlay->OnDetach();
 			m_layers.erase(it);
+		}
 	}
 
 }

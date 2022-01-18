@@ -5,6 +5,7 @@
 #include "Golem/LayerStack.h"
 #include "Render/Device.h"
 #include "Render/Renderer.h"
+#include "ImGui/ImGuiLayer.h"
 
 namespace golem
 {
@@ -15,6 +16,8 @@ namespace golem
 		std::unique_ptr<Window> m_window;
 		std::unique_ptr<Device> m_device;
 		std::unique_ptr<golem::Renderer> m_renderer;
+
+		ImGuiLayer* m_guiLayer;
 
 		bool m_isRunning = true;
 		LayerStack m_layerStack;

@@ -20,6 +20,9 @@ namespace golem
 		m_device = std::make_unique<Device>(*m_window);
 
 		m_renderer = std::make_unique<Renderer>(*m_window, *m_device);
+
+		m_guiLayer = new ImGuiLayer();
+		PushOverlay(m_guiLayer);
 	}
 
 	Application::~Application()
@@ -40,11 +43,20 @@ namespace golem
 			m_renderer->BeginSwapChainRenderPass(commandBuffer);
 
 			for(auto layer : m_layerStack)
-				layer->OnUpdate(commandBuffer);
+				layer->OnUpdate();
+
+			m_guiLayer->Begin();
+			for (auto layer : m_layerStack)
+				layer->OnImGuiRender();
+			m_guiLayer->End(commandBuffer);
 
 			m_renderer->EndSwapChainRenderPass(commandBuffer);
 			m_renderer->EndFrame();
+
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
 		}
+
 		vkDeviceWaitIdle(*m_device);
 	}
 
@@ -53,9 +65,6 @@ namespace golem
 		EventDispatcher dispatcher(e);
 
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUNC(OnWindowClose));
-
-		//if(e.GetEventType() != EventType::MouseMoved)
-		//	GOL_CORE_TRACE("{0}",e.ToString());
 
 		for(auto it = m_layerStack.end(); it != m_layerStack.begin();)
 		{
