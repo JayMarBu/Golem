@@ -21,7 +21,7 @@ project "Golem"
 	location "Golem"
 	kind "SharedLib"
 	language "C++"
-	staticruntime "Off"
+	staticruntime "off"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -66,24 +66,24 @@ project "Golem"
 
 		postbuildcommands
 		{
-			("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
+			("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/Sandbox/\"")
 		}
 
 	filter "configurations:Debug"
 		defines "GOL_DEBUG"
 		symbols "On"
-		buildoptions "/MDd"
 		defines "GOL_ENABLE_ASSERTS"
+		runtime "Debug"
 
 	filter "configurations:Release"
 		defines "GOL_RELEASE"
 		optimize "On"
-		buildoptions "/MD"
+		runtime "Release"
 
 	filter "configurations:Dist"
 		defines "GOL_DIST"
 		optimize "On"
-		buildoptions "/MD"
+		runtime "Release"
 
 project "Sandbox"
 	location "Sandbox"
@@ -115,7 +115,7 @@ project "Sandbox"
 
 	filter "system:windows"
 		cppdialect "C++17"
-		staticruntime "On"
+		staticruntime "on"
 		systemversion "latest"
 
 		defines
@@ -126,14 +126,14 @@ project "Sandbox"
 	filter "configurations:Debug"
 		defines "GOL_DEBUG"
 		symbols "On"
-		buildoptions "/MDd"
+		runtime "Debug"
 
 	filter "configurations:Release"
 		defines "GOL_RELEASE"
 		optimize "On"
-		buildoptions "/MD"
+		runtime "Release"
 
 	filter "configurations:Dist"
 		defines "GOL_DIST"
 		optimize "On" 
-		buildoptions "/MD"
+		runtime "Release"

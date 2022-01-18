@@ -3,7 +3,7 @@ imguidir = "../../../Golem/external/imgui/"
 project "ImGui"
 	kind "StaticLib"
 	language "C++"
-    staticruntime "off"
+    staticruntime "on"
 	location(imguidir)
 
 	targetdir ("../../../bin/" .. outputdir .. "/%{prj.name}")

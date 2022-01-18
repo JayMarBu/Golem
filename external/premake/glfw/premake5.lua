@@ -3,7 +3,7 @@ glfwdir = "../../../Golem/external/glfw/"
 project "GLFW"
 	kind "StaticLib"
 	language "C"
-	staticruntime "Off"
+	staticruntime "on"
 	location (glfwdir)
 
 	targetdir ("../../../bin/" .. outputdir .. "/%{prj.name}")
