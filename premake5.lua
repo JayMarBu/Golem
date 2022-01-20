@@ -44,12 +44,12 @@ project "Golem"
 	{	
 		"glfw",
 		"imgui",
-		"$(VULKAN_SDK)/lib/vulkan-1.lib"
+		"$(VULKAN_SDK)/Lib/vulkan-1.lib"
 	}
 
 	includedirs
 	{
-		"$(VULKAN_SDK)/include",
+		"$(VULKAN_SDK)/Include",
 		"%{prj.name}/external/spdlog/include",
 		"Golem/src",
 		"%{IncludeDir.glfw}",
@@ -104,7 +104,7 @@ project "Sandbox"
 
 	includedirs
 	{
-		"$(VULKAN_SDK)/include",
+		"$(VULKAN_SDK)/Include",
 		"Golem/external/spdlog/include",
 		"Golem/src",
 		"Golem/external",
@@ -113,7 +113,7 @@ project "Sandbox"
 
 	links
 	{
-		"$(VULKAN_SDK)/lib/vulkan-1.lib",
+		"$(VULKAN_SDK)/Lib/vulkan-1.lib",
 		"Golem"
 	}
 
