@@ -67,8 +67,8 @@ namespace golem
 
 	void Renderer::BeginSwapChainRenderPass(VkCommandBuffer commandBuffer)
 	{
-		assert(m_isFrameStarted && "can't begin render pass while frame is not in progress. use BeginFrame() to start new frame");
-		assert(commandBuffer == GetCurrentCommandBuffer() && "can't begin render pass on command buffer from a different frame");
+		GOL_CORE_ASSERT(m_isFrameStarted, "can't begin render pass while frame is not in progress. use BeginFrame() to start new frame");
+		GOL_CORE_ASSERT(commandBuffer == GetCurrentCommandBuffer(), "can't begin render pass on command buffer from a different frame");
 
 		VkRenderPassBeginInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -102,8 +102,8 @@ namespace golem
 
 	void Renderer::EndSwapChainRenderPass(VkCommandBuffer commandBuffer)
 	{
-		assert(m_isFrameStarted && "can't end render pass while frame is not in progress. use BeginFrame() to start new frame");
-		assert(commandBuffer == GetCurrentCommandBuffer() && "can't end render pass on command buffer from a different frame");
+		GOL_CORE_ASSERT(m_isFrameStarted, "can't end render pass while frame is not in progress. use BeginFrame() to start new frame");
+		GOL_CORE_ASSERT(commandBuffer == GetCurrentCommandBuffer(), "can't end render pass on command buffer from a different frame");
 
 		vkCmdEndRenderPass(commandBuffer);
 	}
