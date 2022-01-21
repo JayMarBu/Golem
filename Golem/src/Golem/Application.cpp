@@ -115,11 +115,6 @@ namespace golem
 			// Temp stuff ---------------------------------------------------------
 			m_timer.frame();
 
-			if(Input::IsKeyPressed(GOL_KEY_E))
-			{
-				GOL_CORE_TRACE("test");
-			}
-
 			//if (m_camera.controller.two_D)
 			//	m_camera.controller.MoveInPlaneXY(m_timer.getTime(), m_camera.gObject);
 			//else

@@ -13,11 +13,6 @@ namespace golem
 
 		auto state = glfwGetKey(window, keycode);
 
-		if(state == GLFW_PRESS)
-		{
-			GOL_CORE_TRACE("PRESSED");
-		}
-
 		return state == GLFW_PRESS;
 	}
 
