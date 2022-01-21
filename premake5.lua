@@ -15,6 +15,7 @@ IncludeDir["glfw"] = "Golem/external/glfw/include"
 IncludeDir["imgui"] = "Golem/external/imgui"
 IncludeDir["glm"] = "Golem/external/glm"
 IncludeDir["tinyobj"] = "Golem/external/tinyobjloader"
+IncludeDir["stb"] = "Golem/external/stb"
 
 group "Dependancies"
 	include "external/premake/glfw"
@@ -57,7 +58,8 @@ project "Golem"
 		"%{IncludeDir.glfw}",
 		"%{IncludeDir.imgui}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.tinyobj}"
+		"%{IncludeDir.tinyobj}",
+		"%{IncludeDir.stb}"
 	}
 
 	filter "system:windows"
