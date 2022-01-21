@@ -1,6 +1,8 @@
 #pragma once
 #pragma once
 #include "Golem/Core.h"
+#include "Golem/Input/KeyCodes.h"
+#include "Golem/Input/MouseButtonCodes.h"
 
 namespace golem
 {
@@ -28,6 +30,10 @@ namespace golem
 		inline static float GetMouseX() { return s_instance->GetMouseXImpl(); }
 		inline static float GetMouseY() { return s_instance->GetMouseYImpl(); }
 		inline static MousePos GetMousePos() { return s_instance->GetMousePosImpl(); }
+		inline static void SetMousePos(float x, float y) { s_instance->SetMousePosImpl(x,y);}
+		inline static void SetMousePosCentre() { s_instance->SetMousePosCentreImpl();}
+
+		inline static void SetMouseCursorHidden(bool hidden) {s_instance->SetMouseCursorHiddenImpl(hidden);}
 
 	protected:
 		virtual bool IsKeyPressedImpl(int keycode) = 0;
@@ -35,5 +41,8 @@ namespace golem
 		virtual float GetMouseXImpl() = 0;
 		virtual float GetMouseYImpl() = 0;
 		virtual MousePos GetMousePosImpl() = 0;
+		virtual void SetMousePosImpl(float x, float y) = 0;
+		virtual void SetMousePosCentreImpl() = 0;
+		virtual void SetMouseCursorHiddenImpl(bool hidden) = 0;
 	};
 }

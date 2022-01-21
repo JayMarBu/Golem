@@ -48,4 +48,23 @@ namespace golem
 		return { (float)x,(float)y };
 	}
 
+	void InputWin32::SetMousePosImpl(float x, float y)
+	{
+		const auto window = Application::Get().GetWindow().GetNativeWindow();
+
+		glfwSetCursorPos(static_cast<GLFWwindow*>(window), x, y);
+	}
+
+	void InputWin32::SetMousePosCentreImpl()
+	{
+		const auto window = Application::Get().GetWindow();
+		SetMousePosImpl(window.GetWidth()/2,window.GetHeight()/2);
+	}
+
+	void InputWin32::SetMouseCursorHiddenImpl(bool hidden)
+	{
+		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		glfwSetInputMode(window, GLFW_CURSOR, (hidden == true)? GLFW_CURSOR_HIDDEN : GLFW_CURSOR_NORMAL);
+	}
+
 }

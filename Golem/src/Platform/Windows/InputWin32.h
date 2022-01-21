@@ -16,6 +16,9 @@ namespace golem
 		virtual float GetMouseXImpl() override;
 		virtual float GetMouseYImpl() override;
 		virtual MousePos GetMousePosImpl() override;
+		virtual void SetMousePosImpl(float x, float y) override;
+		virtual void SetMousePosCentreImpl() override;
+		virtual void SetMouseCursorHiddenImpl(bool hidden) override;
 	};
 }
 

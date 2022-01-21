@@ -1,15 +1,15 @@
 #pragma once
 #include "golpch.h"
-#include "Golem/Camera.h"
+#include "Golem/Render/Camera.h"
 
-namespace JEngine
+namespace golem
 {
 	struct FrameInfo
 	{
 		int frameIndex;
 		float frameTime;
 		VkCommandBuffer commandBuffer;
-		//Camera& camera;
+		Camera& camera;
 		VkDescriptorSet globalDescriptorSet;
 	};
 }
