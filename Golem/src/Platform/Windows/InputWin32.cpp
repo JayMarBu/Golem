@@ -5,7 +5,7 @@
 
 namespace golem
 {
-	Input* Input::s_instance = nullptr;
+	Input* Input::s_instance = new InputWin32();
 
 	bool InputWin32::IsKeyPressedImpl(int keycode)
 	{
@@ -13,7 +13,12 @@ namespace golem
 
 		auto state = glfwGetKey(window, keycode);
 
-		return state == GLFW_PRESS || GLFW_REPEAT;
+		if(state == GLFW_PRESS)
+		{
+			GOL_CORE_TRACE("PRESSED");
+		}
+
+		return state == GLFW_PRESS;
 	}
 
 	bool InputWin32::IsMouseButtonPressedImpl(int button)
@@ -57,14 +62,15 @@ namespace golem
 
 	void InputWin32::SetMousePosCentreImpl()
 	{
-		const auto window = Application::Get().GetWindow();
+		auto& window = Application::Get().GetWindow();
 		SetMousePosImpl(window.GetWidth()/2,window.GetHeight()/2);
 	}
 
 	void InputWin32::SetMouseCursorHiddenImpl(bool hidden)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-		glfwSetInputMode(window, GLFW_CURSOR, (hidden == true)? GLFW_CURSOR_HIDDEN : GLFW_CURSOR_NORMAL);
+		int hiddenFlag = (hidden == true) ? GLFW_CURSOR_HIDDEN : GLFW_CURSOR_NORMAL;
+		glfwSetInputMode(window, GLFW_CURSOR, hiddenFlag);
 	}
 
 }

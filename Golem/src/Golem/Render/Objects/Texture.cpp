@@ -32,9 +32,7 @@ namespace golem
 		int texChannels;
 		stbi_uc* pixels = stbi_load(filePath.c_str(), (int*)&m_width, (int*)&m_height, &texChannels, STBI_rgb_alpha);
 
-		if (!pixels) {
-			throw std::runtime_error("failed to load texture image!");
-		}
+		GOL_CORE_ASSERT(pixels != NULL, "failed to load texture image!");
 
 		Buffer stagingBuffer(
 			device,

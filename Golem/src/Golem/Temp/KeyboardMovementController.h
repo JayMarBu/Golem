@@ -37,8 +37,8 @@ namespace golem
 
 	public:
 
-		void MoveInPlaneXZ(Window* window, float dt, TempGameObject& gameObject);
-		void MoveInPlaneXY(Window* window, float dt, TempGameObject& gameObject);
+		void MoveInPlaneXZ(float dt, TempGameObject& gameObject);
+		void MoveInPlaneXY(float dt, TempGameObject& gameObject);
 
 		void DrawGui(TempGameObject& gameObject);
 	};

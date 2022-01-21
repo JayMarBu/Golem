@@ -39,8 +39,7 @@ project "Golem"
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp",
-		"%{prj.name}/src/**.cc"
+		"%{prj.name}/src/**.cpp"
 	}
 
 	links
@@ -119,7 +118,8 @@ project "Sandbox"
 		"Golem/external/spdlog/include",
 		"Golem/src",
 		"Golem/external",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.tinyobj}"
 	}
 
 	links

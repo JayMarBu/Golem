@@ -3,15 +3,15 @@
 
 #include "../Input/Input.h"
 #include "../Utils.h"
-#include "glm/gtc/constants.inl"
 #include "glm/common.hpp"
 
 #include "imgui.h"
+#include "../Application.h"
 
 namespace golem
 {
 
-	void KeyboardMovementController::MoveInPlaneXZ(Window* window, float dt, TempGameObject& gameObject)
+	void KeyboardMovementController::MoveInPlaneXZ(float dt, TempGameObject& gameObject)
 	{
 		glm::vec3 rotate{ 0.0f };
 
@@ -28,8 +28,10 @@ namespace golem
 		{
 			Input::SetMouseCursorHidden(true);
 
-			deltax = Input::GetMouseX() - (window->GetExtent().width / 2);
-			deltay = Input::GetMouseY() - (window->GetExtent().height / 2);
+			auto& window = Application::Get().GetWindow();
+
+			deltax = Input::GetMouseX() - (window.GetExtent().width / 2);
+			deltay = Input::GetMouseY() - (window.GetExtent().height / 2);
 
 			rotate.y += turnSpeed * dt * (float)deltax;
 			rotate.x -= turnSpeed * dt * (float)deltay;
@@ -71,7 +73,7 @@ namespace golem
 			gameObject.transform.translation += moveSpeed * dt * glm::normalize(moveDir);
 	}
 
-	void KeyboardMovementController::MoveInPlaneXY(Window* window, float dt, TempGameObject& gameObject)
+	void KeyboardMovementController::MoveInPlaneXY(float dt, TempGameObject& gameObject)
 	{
 		const glm::vec3 forwardDir{ 0, 0.0f, 1 };
 		const glm::vec3 rightDir{ forwardDir.z, 0.0f, -forwardDir.x };
