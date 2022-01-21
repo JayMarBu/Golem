@@ -7,6 +7,7 @@
 
 // Containers *************************************************************************************
 #include <vector>
+#include <map>
 #include <unordered_map>
 #include <string>
 using std::string;
@@ -35,10 +36,16 @@ using std::string;
 #include <cstddef>
 #include <algorithm>
 #include <initializer_list>
+#include <cstdarg>
 
 // Vulkan *****************************************************************************************
 #include <vulkan/vulkan.h>
 
 // Golem ******************************************************************************************
 #include "Golem/Log.h"
+
+// glm ********************************************************************************************
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
 

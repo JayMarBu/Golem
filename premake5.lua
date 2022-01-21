@@ -14,6 +14,7 @@ IncludeDir = {}
 IncludeDir["glfw"] = "Golem/external/glfw/include"
 IncludeDir["imgui"] = "Golem/external/imgui"
 IncludeDir["glm"] = "Golem/external/glm"
+IncludeDir["tinyobj"] = "Golem/external/tinyobjloader"
 
 group "Dependancies"
 	include "external/premake/glfw"
@@ -37,7 +38,8 @@ project "Golem"
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/src/**.cc"
 	}
 
 	links
@@ -54,10 +56,9 @@ project "Golem"
 		"Golem/src",
 		"%{IncludeDir.glfw}",
 		"%{IncludeDir.imgui}",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.tinyobj}"
 	}
-
-
 
 	filter "system:windows"
 		systemversion "latest"
@@ -73,11 +74,19 @@ project "Golem"
 
 	filter "configurations:Debug"
 		defines "GOL_DEBUG"
+		links 
+		{
+			"$(VULKAN_SDK)/Lib/shaderc_combinedd.lib"
+		}
 		symbols "on"
 		runtime "Debug"
 
 	filter "configurations:Release"
 		defines "GOL_RELEASE"
+		links 
+		{
+			"$(VULKAN_SDK)/Lib/shaderc_combined.lib"
+		}
 		optimize "on"
 		runtime "Release"
 
@@ -127,11 +136,19 @@ project "Sandbox"
 
 	filter "configurations:Debug"
 		defines "GOL_DEBUG"
+		links 
+		{
+			"$(VULKAN_SDK)/Lib/shaderc_combinedd.lib"
+		}
 		symbols "on"
 		runtime "Debug"
 
 	filter "configurations:Release"
 		defines "GOL_RELEASE"
+		links 
+		{
+			"$(VULKAN_SDK)/Lib/shaderc_combined.lib"
+		}
 		optimize "on"
 		runtime "Release"
 

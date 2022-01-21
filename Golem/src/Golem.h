@@ -6,9 +6,9 @@
 #include "Golem/Log.h"
 #include "Golem/Layer.h"
 #include "Golem/ImGui/ImGuiLayer.h"
-#include "Golem/Input.h"
-#include "Golem/MouseButtonCodes.h"
-#include "Golem/KeyCodes.h"
+#include "Golem/Input/Input.h"
+#include "Golem/Input/MouseButtonCodes.h"
+#include "Golem/Input/KeyCodes.h"
 #include "Golem/Events/Event.h"
 
 // Entry Point ************************************************************************************

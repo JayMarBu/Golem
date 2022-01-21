@@ -44,13 +44,13 @@ namespace golem
 
 		inline int GetFrameIndex() const
 		{
-			assert(m_isFrameStarted && "Cannot get frame index when frame not in progress. have you begun this frame using BeginFrame()?");
+			GOL_CORE_ASSERT(m_isFrameStarted, "Cannot get frame index when frame not in progress. have you begun this frame using BeginFrame()?");
 			return m_currentFrameIndex;
 		}
 
 		inline VkCommandBuffer GetCurrentCommandBuffer() const
 		{
-			assert(m_isFrameStarted && "Cannot get command buffer when frame not in progress. have you begun this frame using BeginFrame()?");
+			GOL_CORE_ASSERT(m_isFrameStarted, "Cannot get command buffer when frame not in progress. have you begun this frame using BeginFrame()?");
 			return m_commandBuffers[m_currentFrameIndex];
 		}
 

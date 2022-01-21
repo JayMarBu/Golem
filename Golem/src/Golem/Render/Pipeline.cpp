@@ -1,5 +1,6 @@
 #include "golpch.h"
 #include "Pipeline.h"
+#include "../Application.h"
 
 namespace golem
 {
@@ -119,6 +120,23 @@ namespace golem
 		file.close();
 
 		return buffer;
+	}
+
+	golem::Pipeline* Pipeline::CreatePipeline(
+		const std::string& vert_filepath,
+		const std::string& frag_filepath,
+		const PipelineConfigInfo& configInfo,
+		const std::vector<VkVertexInputBindingDescription>& vertexBindingDesc,/* = Model::Vertex::getBindingDescriptions(), */ 
+		const std::vector<VkVertexInputAttributeDescription>& vertexAttribDesc/* = Model::Vertex::getAttributeDescriptions() */
+		)
+	{
+		return new golem::Pipeline(
+			Application::Get().GetDevice(),
+			{vert_filepath,frag_filepath},
+			configInfo,
+			vertexBindingDesc,
+			vertexAttribDesc
+		);
 	}
 
 	void Pipeline::CreateGraphicsPipeline(

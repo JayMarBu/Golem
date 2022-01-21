@@ -1,7 +1,6 @@
 #pragma once
-#pragma once
 
-#include "Golem/Input.h"
+#include "Golem/Input/Input.h"
 
 namespace golem
 {

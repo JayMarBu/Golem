@@ -122,9 +122,17 @@ namespace golem
 
 		REMOVE_COPY_CONSTRUCTOR(Pipeline)
 
-			static void DefaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
+		static void DefaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
 
 		void Bind(VkCommandBuffer commandBuffer);
+
+		static Pipeline* CreatePipeline(
+			const std::string& vert_filepath,
+			const std::string& frag_filepath,
+			const PipelineConfigInfo& configInfo,
+			const std::vector<VkVertexInputBindingDescription>& vertexBindingDesc,
+			const std::vector<VkVertexInputAttributeDescription>& vertexAttribDesc
+		);
 
 	private:
 		static std::vector<char> ReadFile(const std::string& filepath);
