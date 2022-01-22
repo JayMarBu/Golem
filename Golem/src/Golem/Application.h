@@ -18,14 +18,14 @@
 
 namespace golem
 {
-	struct CameraWrapper
+	/*struct CameraWrapper
 	{
 		CameraWrapper() : gObject(TempGameObject::Create()) {}
 
 		Camera camera{};
 		TempGameObject gObject;
 		KeyboardMovementController controller{};
-	};
+	};*/
 
 	class Application
 	{
@@ -38,7 +38,7 @@ namespace golem
 		// Temp stuff ---------------------------------------------------------
 		std::unique_ptr<TextureManager> m_textureManager;
 
-		std::unique_ptr<DescriptorPool> m_globalPool;
+		/*std::unique_ptr<DescriptorPool> m_globalPool;
 		std::unique_ptr<DescriptorSetLayout> m_globalSetLayout;
 		std::vector<VkDescriptorSet> m_globalDescriptorSets;
 
@@ -49,9 +49,8 @@ namespace golem
 		std::vector<TempGameObject> m_gameObjects;
 		CameraWrapper m_camera{};
 
-		std::unique_ptr<Sampler> m_sampler;
+		std::unique_ptr<Sampler> m_sampler;*/
 
-		FrameTimer m_timer;
 		// Temp stuff ---------------------------------------------------------
 
 		ImGuiLayer* m_guiLayer;
@@ -70,6 +69,7 @@ namespace golem
 		inline Window& GetWindow() { return *m_window;}
 		inline Device& GetDevice() { return *m_device;}
 		inline Renderer& GetRenderer() { return *m_renderer;}
+		inline TextureManager& GetTextureManager() { return *m_textureManager;}
 
 		void Run();
 
