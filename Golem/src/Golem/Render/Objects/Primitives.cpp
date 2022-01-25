@@ -110,16 +110,16 @@ namespace golem
 					//   1
 					//  /|
 					// 2-3
-					{{-u, -u, u},	COLOUR_WHITE, NORMAL(0,0,-1),	{1,0}},
-					{{u, u, u},		COLOUR_WHITE, NORMAL(0,0,-1),	{0,1}},
-					{{-u, u, u},	COLOUR_WHITE, NORMAL(0,0,-1),	{1,1}},
+					{{-u, -u, u},	COLOUR_WHITE, NORMAL(0,0,1),	{1,0}},
+					{{u, u, u},		COLOUR_WHITE, NORMAL(0,0,1),	{0,1}},
+					{{-u, u, u},	COLOUR_WHITE, NORMAL(0,0,1),	{1,1}},
 
 					// 3-1 
 					// |/
 					// 2
-					{{-u, -u, u},	COLOUR_WHITE, NORMAL(0,0,-1),	{1,0}},
-					{{u, -u, u},	COLOUR_WHITE, NORMAL(0,0,-1),	{0,0}},
-					{{u, u, u},		COLOUR_WHITE, NORMAL(0,0,-1),	{0,1}},
+					{{-u, -u, u},	COLOUR_WHITE, NORMAL(0,0,1),	{1,0}},
+					{{u, -u, u},	COLOUR_WHITE, NORMAL(0,0,1),	{0,0}},
+					{{u, u, u},		COLOUR_WHITE, NORMAL(0,0,1),	{0,1}},
 	#pragma endregion
 
 	#pragma region  // ****** Left face ******
@@ -142,58 +142,45 @@ namespace golem
 					// 1
 					// |\
 					// 3-2
-					{{u, -u, -u},	COLOUR_WHITE, NORMAL(-1,0,0),	{0,0}},
-					{{u, u, u},		COLOUR_WHITE, NORMAL(-1,0,0),	{1,1}},
-					{{u, u, -u},	COLOUR_WHITE, NORMAL(-1,0,0),	{0,1}},
+					{{u, -u, -u},	COLOUR_WHITE, NORMAL(1,0,0),	{0,0}},
+					{{u, u, u},		COLOUR_WHITE, NORMAL(1,0,0),	{1,1}},
+					{{u, u, -u},	COLOUR_WHITE, NORMAL(1,0,0),	{0,1}},
 
 					// 1-2 
 					//  \|
 					//   3
-					{{u, -u, -u},	COLOUR_WHITE, NORMAL(-1,0,0),	{0,0}},
-					{{u, -u, u},	COLOUR_WHITE, NORMAL(-1,0,0),	{1,0}},
-					{{u, u, u},		COLOUR_WHITE, NORMAL(-1,0,0),	{1,1}},
+					{{u, -u, -u},	COLOUR_WHITE, NORMAL(1,0,0),	{0,0}},
+					{{u, -u, u},	COLOUR_WHITE, NORMAL(1,0,0),	{1,0}},
+					{{u, u, u},		COLOUR_WHITE, NORMAL(1,0,0),	{1,1}},
 	#pragma endregion
 				};
 			}
 
 		}
 
-		void Line(std::vector<Vertex>* vertices, std::vector<uint32_t>* indices, glm::vec3 colour)
+		void Quad(std::vector<Vertex>* vertices, std::vector<uint32_t>* indices, glm::vec3 colour /*= { 1,1,1 }*/)
 		{
-			if (vertices == nullptr || indices == nullptr)
-				throw std::runtime_error("nullptr error, either vertex or index array are not present");
+			const float u = 0.5f;
 
-			*vertices = {
-			{{0.f, 0.f, -0.01f},			colour, NORMAL(0,0,0),	{0,0}}, // 0
-			{{0.f, -1.f, -0.01f},			colour, NORMAL(0,0,0),	{0,0} },// 1
-			{{0.0095106, 0.f, -0.0030902},	colour, NORMAL(0,0,0),	{0,0}}, // 2
-			{{0.0095106, -1.f, -0.0030902},	colour, NORMAL(0,0,0),	{0,0} },// 3
-			{{0.0058779, 0.f, 0.0080902},	colour, NORMAL(0,0,0),	{0,0}}, // 4
-			{{0.0058779, -1.f, 0.0080902},	colour, NORMAL(0,0,0),	{0,0} },// 5
-			{{-0.0058779, 0.f, 0.0080902},	colour, NORMAL(0,0,0),	{0,0}}, // 6
-			{{-0.0058779, -1.f, 0.0080902},	colour, NORMAL(0,0,0),	{0,0} },// 7
-			{{-0.0095106, 0.f, -0.0030902},	colour, NORMAL(0,0,0),	{0,0}}, // 8
-			{{-0.0095106, -1.f, -0.0030902},colour, NORMAL(0,0,0),	{0,0} },// 9
-			};
+			if (indices)
+			{
+				*vertices = {
+				{{-u, 0.0, -u},	COLOUR_WHITE, NORMAL(0,-1,0),	{0,0}}, // 0
+				{{-u, 0.0, u},	COLOUR_WHITE, NORMAL(0,-1,0),	{0,1}}, // 1
+				{{u, 0.0, u},	COLOUR_WHITE, NORMAL(0,-1,0),	{1,1}}, // 2
+				{{u, 0.0, -u},	COLOUR_WHITE, NORMAL(0,-1,0),	{1,0}}  // 3
+				};
 
-			*indices = {
-				1, 2, 0,
-				3, 4, 2,
-				5, 6, 4,
-				1, 9, 7,
-				7, 8, 6,
-				9, 0, 8,
-				2, 6, 8,
-				1, 3, 2,
-				3, 5, 4,
-				5, 7, 6,
-				5, 3, 7,
-				3, 1, 7,
-				7, 9, 8,
-				9, 1, 0,
-				8, 0, 2,
-				2, 4, 6,
-			};
+				*indices = {
+					0,2,1,
+					2,0,3,
+				};
+
+				return;
+			}
+
+			GOL_CORE_ASSERT(false, "No support for non-indexed quad exists");
+			
 		}
 
 	}

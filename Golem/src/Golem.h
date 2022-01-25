@@ -21,7 +21,6 @@
 #include "Golem/Render/Objects/Sampler.h"
 #include "Golem/Render/Objects/Texture.h"
 #include "Golem/Render/Pipeline.h"
-#include "Golem/Render/RenderSystem/SimpleRenderSystem.h"
 #include "Golem/Render/RenderSystem/RenderSystemBase.h"
 
 // Entry Point ************************************************************************************

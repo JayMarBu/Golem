@@ -25,14 +25,21 @@ namespace golem
 		operator glm::mat4() { return mat4(); }
 	};
 
+	struct CPointLight
+	{
+		float lightIntensity = 1.0f;
+	};
+
 	class TempGameObject
 	{
 		// Members ********************************************************************************
 	public:
 		using id_t = unsigned int;
 
-		std::shared_ptr<Model> model{};
+		std::shared_ptr<Model> model = nullptr;
 		glm::vec3 colour{};
+
+		std::unique_ptr<CPointLight> pointLight = nullptr;
 		CTransform transform{};
 
 	private:
@@ -51,6 +58,8 @@ namespace golem
 			static id_t currentId = 0;
 			return TempGameObject(currentId++);
 		}
+
+		static TempGameObject CreatePointLight(float intensity = 10.0f, float radius = 0.1f, glm::vec3 colour = glm::vec3(1.0f));
 
 		id_t getID() { return id; }
 

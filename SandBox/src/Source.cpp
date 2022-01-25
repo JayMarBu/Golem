@@ -1,5 +1,12 @@
 #include "Golem.h"
 #include "ImGui/imgui.h"
+#include "Golem/Temp/KeyboardMovementController.h"
+#include "Golem/FrameTimer.h"
+
+#include "Golem/Render/RenderSystem/SimpleRenderSystem.h"
+#include "Golem/Render/RenderSystem/PointLightRenderSystem.h"
+
+using golem::Application;
 
 struct CameraWrapper
 {
@@ -10,11 +17,7 @@ struct CameraWrapper
 	golem::KeyboardMovementController controller{};
 };
 
-struct GlobalUBO
-{
-	glm::mat4 projectionView{ 1.0f };
-	glm::vec3 lightDir = glm::normalize(glm::vec3(1, -3, -1));
-};
+
 
 class ExampleLayer : public golem::Layer
 {
@@ -26,6 +29,7 @@ private:
 	std::vector<std::unique_ptr<golem::Buffer>> m_UBObuffers;
 
 	std::unique_ptr<golem::SimpleRenderSystem> m_simpleRenderSystem;
+	std::unique_ptr<golem::PointLightRenderSystem> m_pointLightRenderSystem;
 
 	std::vector<golem::TempGameObject> m_gameObjects;
 	CameraWrapper m_camera{};
@@ -45,13 +49,45 @@ public:
 
 		auto& device = golem::Application::Get().GetDevice();
 
-		std::shared_ptr<golem::Model> model = golem::Model::CreateModelFromPrimative(device, golem::Primitives::Cube, false);
+		std::shared_ptr<golem::Model> cubeModel = golem::Model::CreateModelFromPrimative(device, golem::Primitives::Cube, false);
 		auto cube = golem::TempGameObject::Create();
-		cube.model = model;
-		cube.transform.translation = { 0.f,0.f,-.01f };
+		cube.model = cubeModel;
+		cube.transform.translation = { 1.5f,0.f,-.01f };
 		m_gameObjects.push_back(std::move(cube));
 
-		//m_textureManager->LoadTexture("bunny", "media/textures/bunny.png");
+		std::shared_ptr<golem::Model> quadModel = golem::Model::CreateModelFromPrimative(device, golem::Primitives::Quad);
+		auto quad = golem::TempGameObject::Create();
+		quad.model = quadModel;
+		quad.transform.translation = { 0,0.75f,0 };
+		quad.transform.scale = { 7,1,7 };
+		m_gameObjects.push_back(std::move(quad));
+
+		std::shared_ptr<golem::Model> vaseModel = golem::Model::CreateModelFromFile(device, "models/smooth_vase.obj");
+		auto vase = golem::TempGameObject::Create();
+		vase.model = vaseModel;
+		vase.transform.translation = { -1.5f,0.5f,-.01f };
+		vase.transform.scale = {5,5,5};
+		m_gameObjects.push_back(std::move(vase));
+
+		std::vector<glm::vec3> lightColors{
+			{1.f, .1f, .1f},
+			{.1f, .1f, 1.f},
+			{.1f, 1.f, .1f},
+			{1.f, 1.f, .1f},
+			{.1f, 1.f, 1.f},
+			{1.f, 1.f, 1.f}
+		};
+
+		for(int i = 0; i < lightColors.size(); i++)
+		{
+			auto pLight = golem::TempGameObject::CreatePointLight(1.0f, 0.05f, lightColors[i]);
+
+			auto rotateLight = glm::rotate(glm::mat4(1.0f),(i*glm::two_pi<float>())/lightColors.size(), {0,-1,0});
+
+			pLight.transform.translation = 1.5f* glm::vec3(rotateLight * glm::vec4(-1,-0.5, -1, 1));
+
+			m_gameObjects.push_back(std::move(pLight));
+		}
 
 		// init ubo
 		m_UBObuffers.resize(golem::SwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -60,7 +96,7 @@ public:
 		{
 			m_UBObuffers[i] = std::make_unique<golem::Buffer>(
 				device,
-				sizeof(GlobalUBO),
+				sizeof(golem::GlobalUBO),
 				1,
 				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
@@ -80,7 +116,7 @@ public:
 			.build();
 
 		m_globalSetLayout = golem::DescriptorSetLayout::Builder(device)
-			.AddBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+			.AddBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
 			.AddBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
 			.Build();
 
@@ -103,20 +139,40 @@ public:
 			m_globalSetLayout->GetDescriptorSetLayout(),
 			"shaders/simple_shader/simple_shader.vert.spv",
 			"shaders/simple_shader/simple_shader.frag.spv");
+
+		m_pointLightRenderSystem = std::make_unique<golem::PointLightRenderSystem>(
+			device,
+			golem::Application::Get().GetRenderer().GetSwapChainRenderPass(),
+			m_globalSetLayout->GetDescriptorSetLayout());
 	}
 
-	void OnUpdate(VkCommandBuffer commandBuffer) override
+	void OnPostRender() override
+	{
+		if(m_simpleRenderSystem->HasRegenerated())
+		{
+			m_simpleRenderSystem->CompleteRegeneration();
+		}
+
+		if (m_pointLightRenderSystem->HasRegenerated())
+		{
+			m_pointLightRenderSystem->CompleteRegeneration();
+		}
+	}
+
+	void OnRender(VkCommandBuffer commandBuffer) override
 	{
 		m_timer.frame();
 
+		
+
+		// ------ update camera ------
 		m_camera.controller.MoveInPlaneXZ(m_timer.getTime(), m_camera.gObject);
 		m_camera.camera.SetViewXYZ(m_camera.gObject.transform.translation, m_camera.gObject.transform.rotation);
 
 		float aspect = golem::Application::Get().GetRenderer().GetAspectRatio();
 		m_camera.camera.SetPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 100.0f);
 
-		// Temp stuff ---------------------------------------------------------
-			// ******fill frame info struct * *****
+		// ------ fill frame info struct ------
 		golem::FrameInfo fInfo{
 			golem::Application::Get().GetRenderer().GetFrameIndex(),
 			m_timer.getTime(),
@@ -125,21 +181,59 @@ public:
 			m_globalDescriptorSets[golem::Application::Get().GetRenderer().GetFrameIndex()]
 		};
 
-		// ****** update uniform buffers ******
-		GlobalUBO ubo{};
-		ubo.projectionView = m_camera.camera.GetProjection() * m_camera.camera.GetView();
+		// ------ update uniform buffers ------
+		golem::GlobalUBO ubo{};
+		ubo.projection = m_camera.camera.GetProjection();
+		ubo.view = m_camera.camera.GetView();
+
+		m_pointLightRenderSystem->Update(fInfo, ubo, m_gameObjects);
 
 		m_UBObuffers[fInfo.frameIndex]->WriteToBuffer(&ubo);
 		m_UBObuffers[fInfo.frameIndex]->Flush();
-		// Temp stuff ---------------------------------------------------------
 
+
+		// ------ render scene ------
 		m_simpleRenderSystem->RenderGameObjects(fInfo, m_gameObjects);
+		m_pointLightRenderSystem->Render(fInfo, m_gameObjects);
 	}
 
 	void OnImGuiRender() override
 	{
-		//ImGui::Begin("test");
-		//ImGui::End();
+		ImGui::Begin("test");
+
+		if (ImGui::Button("Recompile Simple Shader") && !m_simpleRenderSystem->IsRegenerating())
+		{
+			golem::ThreadPool::Task task = [=] 
+			{
+				m_simpleRenderSystem->RuntimeCreatePipeline
+				(
+				golem::Application::Get().GetRenderer().GetSwapChainRenderPass(),
+				{
+					"shaders/simple_shader/simple_shader.vert",
+					"shaders/simple_shader/simple_shader.frag"
+				});
+			};
+
+			Application::Get().GetThreadPool().Enqueue(task);
+		}
+
+		if (ImGui::Button("Recompile Point Light Shader") && !m_pointLightRenderSystem->IsRegenerating())
+		{
+			golem::ThreadPool::Task task = [=]
+			{
+				m_pointLightRenderSystem->RuntimeCreatePipeline
+				(
+				golem::Application::Get().GetRenderer().GetSwapChainRenderPass(),
+				{
+					"shaders/point_light_shader/point_light_shader.vert",
+					"shaders/point_light_shader/point_light_shader.frag"
+				});
+			};
+
+			Application::Get().GetThreadPool().Enqueue(task);
+		}
+
+		ImGui::End();
 	}
 
 	void OnEvent(golem::Event& e) override
@@ -155,7 +249,6 @@ public:
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
-		//PushOverlay(new golem::ImGuiLayer());
 	}
 
 	~Sandbox()

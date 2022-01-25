@@ -49,7 +49,7 @@ namespace golem
 			m_renderer->BeginSwapChainRenderPass(commandBuffer);
 
 			for(auto layer : m_layerStack)
-				layer->OnUpdate(commandBuffer);
+				layer->OnRender(commandBuffer);
 
 			m_guiLayer->Begin();
 			for (auto layer : m_layerStack)
@@ -61,6 +61,9 @@ namespace golem
 
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
+
+			for (auto layer : m_layerStack)
+				layer->OnPostRender();
 		}
 
 		vkDeviceWaitIdle(*m_device);

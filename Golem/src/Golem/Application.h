@@ -8,25 +8,10 @@
 #include "ImGui/ImGuiLayer.h"
 
 #include "Temp/TextureManager.h"
-#include "Render/Buffer.h"
-#include "Render/RenderSystem/SimpleRenderSystem.h"
-#include "Temp/TempGameObject.h"
-#include "Render/Objects/Sampler.h"
-#include "Temp/KeyboardMovementController.h"
-#include "Render/Camera.h"
-#include "FrameTimer.h"
+#include "ThreadPool.h"
 
 namespace golem
 {
-	/*struct CameraWrapper
-	{
-		CameraWrapper() : gObject(TempGameObject::Create()) {}
-
-		Camera camera{};
-		TempGameObject gObject;
-		KeyboardMovementController controller{};
-	};*/
-
 	class Application
 	{
 		// Members ********************************************************************************
@@ -34,22 +19,10 @@ namespace golem
 		std::unique_ptr<Window> m_window;
 		std::unique_ptr<Device> m_device;
 		std::unique_ptr<golem::Renderer> m_renderer;
+		ThreadPool m_threadPool{32};
 
 		// Temp stuff ---------------------------------------------------------
 		std::unique_ptr<TextureManager> m_textureManager;
-
-		/*std::unique_ptr<DescriptorPool> m_globalPool;
-		std::unique_ptr<DescriptorSetLayout> m_globalSetLayout;
-		std::vector<VkDescriptorSet> m_globalDescriptorSets;
-
-		std::vector<std::unique_ptr<Buffer>> m_UBObuffers;
-
-		std::unique_ptr<SimpleRenderSystem> m_simpleRenderSystem;
-
-		std::vector<TempGameObject> m_gameObjects;
-		CameraWrapper m_camera{};
-
-		std::unique_ptr<Sampler> m_sampler;*/
 
 		// Temp stuff ---------------------------------------------------------
 
@@ -66,6 +39,7 @@ namespace golem
 
 		static Application& Get() {return *s_instance;}
 
+		inline ThreadPool& GetThreadPool() {return m_threadPool;}
 		inline Window& GetWindow() { return *m_window;}
 		inline Device& GetDevice() { return *m_device;}
 		inline Renderer& GetRenderer() { return *m_renderer;}

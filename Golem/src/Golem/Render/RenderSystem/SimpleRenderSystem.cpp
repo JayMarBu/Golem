@@ -28,15 +28,15 @@ namespace golem
 		//shaderPaths.frag_filepath = "shaders/simple_shader/simple_shader.frag.spv";
 
 
-		PipelineConfigInfo pipelineConfig{};
-		Pipeline::DefaultPipelineConfigInfo(pipelineConfig);
+		//PipelineConfigInfo pipelineConfig{};
+		Pipeline::DefaultPipelineConfigInfo(m_configInfo);
 
-		CreatePipeline(_renderPass, shaderPaths, pipelineConfig);
+		CreatePipeline(_renderPass, shaderPaths, m_configInfo);
 	}
 
 	SimpleRenderSystem::~SimpleRenderSystem()
 	{
-
+		//vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
 	}
 
 	void SimpleRenderSystem::RenderGameObjects(FrameInfo& fInfo, std::vector<TempGameObject>& gameObjects)
@@ -56,6 +56,9 @@ namespace golem
 		{
 			//obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + (1.f*fInfo.frameTime), glm::two_pi<float>());
 			//obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + (0.1f* fInfo.frameTime), glm::two_pi<float>());
+
+			if(obj.model == nullptr)
+				continue;
 
 			SimplePushConstantData pushData{};
 

@@ -77,7 +77,7 @@ project "Golem"
 		defines "GOL_DEBUG"
 		links 
 		{
-			"$(VULKAN_SDK)/Lib/shaderc_combinedd.lib"
+			"$(VULKAN_SDK)/Lib/shaderc_sharedd.lib"
 		}
 		symbols "on"
 		runtime "Debug"
@@ -86,7 +86,7 @@ project "Golem"
 		defines "GOL_RELEASE"
 		links 
 		{
-			"$(VULKAN_SDK)/Lib/shaderc_combined.lib"
+			"$(VULKAN_SDK)/Lib/shaderc_shared.lib"
 		}
 		optimize "on"
 		runtime "Release"
@@ -109,7 +109,9 @@ project "Sandbox"
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/shaders/**.vert",
+		"%{prj.name}/shaders/**.frag"
 	}
 
 	includedirs
@@ -128,6 +130,8 @@ project "Sandbox"
 		"Golem"
 	}
 
+	
+
 	filter "system:windows"
 		systemversion "latest"
 
@@ -136,21 +140,30 @@ project "Sandbox"
 			"GOL_PLATFORM_WINDOWS"
 		}
 
+		postbuildcommands
+		{
+			"for /R %%f in (*.vert *.frag ) do ( \n"..
+				"echo Compiling: %%f\n"..
+				"%VULKAN_SDK%/Bin/glslc.exe %%f -o %%f.spv\n"..
+				"echo.\n"..
+				")"
+		}
+
 	filter "configurations:Debug"
 		defines "GOL_DEBUG"
-		links 
-		{
-			"$(VULKAN_SDK)/Lib/shaderc_combinedd.lib"
-		}
+		--links 
+		--{
+		--	"$(VULKAN_SDK)/Lib/shaderc_combinedd.lib"
+		--}
 		symbols "on"
 		runtime "Debug"
 
 	filter "configurations:Release"
 		defines "GOL_RELEASE"
-		links 
-		{
-			"$(VULKAN_SDK)/Lib/shaderc_combined.lib"
-		}
+		--links 
+		--{
+		--	"$(VULKAN_SDK)/Lib/shaderc_combined.lib"
+		--}
 		optimize "on"
 		runtime "Release"
 

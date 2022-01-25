@@ -65,17 +65,6 @@ namespace golem
 			data.eventCallback(event);
 		});
 
-		/*glfwSetWindowSizeCallback(m_window, [](GLFWwindow* window, int width, int height) 
-		{
-			WindowData& data =  *(WindowData*)glfwGetWindowUserPointer(window);
-
-			data.width = width;
-			data.height = height;
-
-			WindowResizeEvent event(width, height);
-			data.eventCallback(event);
-		});*/
-
 		glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);

@@ -1,0 +1,6 @@
+$(VULKAN_SDK)\Bin32\glslc.exe %(Identity) -o %(Identity).spv
+
+for %%f in (*.vert *.tesc *.tese *.geom *.frag *.comp) do %VK_SDK_PATH%\Bin\glslangValidator.exe -V -o $(OutDir)\%%f.spv %%f
+
+for /R %%f in (*.vert *.tesc *.tese *.geom *.frag *.comp) do %VULKAN_SDK%\Bin32\glslc.exe %%f -o %%f.spv
+for %%f in (*.vert *.tesc *.tese *.geom *.frag *.comp) do echo %%~nf

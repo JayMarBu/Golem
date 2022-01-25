@@ -6,6 +6,7 @@ namespace golem
 {
 	struct PipelineConfigInfo
 	{
+		PipelineConfigInfo() = default;
 		REMOVE_COPY_CONSTRUCTOR(PipelineConfigInfo);
 
 		// STRUCT INFO:
@@ -60,8 +61,8 @@ namespace golem
 			*	also contains info regarding the uniform and push values
 			*	referenced by the shader that can be updated at draw time.
 			*/
-
-			// viewport info
+		
+		// viewport info
 		VkPipelineViewportStateCreateInfo viewportInfo{};
 
 		// input assembler info
@@ -82,14 +83,30 @@ namespace golem
 		// depth and stencil info
 		VkPipelineDepthStencilStateCreateInfo depthStencilInfo{};
 
-		std::vector<VkDynamicState> dynamicStateEnables;
-		VkPipelineDynamicStateCreateInfo dynamicStateInfo;
+		std::vector<VkDynamicState> dynamicStateEnables{};
+		VkPipelineDynamicStateCreateInfo dynamicStateInfo{};
 
 		// layout info
 		VkPipelineLayout pipelineLayout = nullptr;
 
+		std::vector<VkVertexInputAttributeDescription> vertexAttribDesc{};
+		std::vector<VkVertexInputBindingDescription> vertexBindingDesc{};
+
 		VkRenderPass renderPass = nullptr;
 		uint32_t subpass = 0;
+
+		void SetData(PipelineConfigInfo& other)
+		{
+			viewportInfo = other.viewportInfo;
+			inputAssemblyInfo = other.inputAssemblyInfo;
+			rasterizationInfo = other.rasterizationInfo;
+			multisampleInfo = other.multisampleInfo;
+			colorBlendAttachment = other.colorBlendAttachment;
+			colorBlendInfo = other.colorBlendInfo;
+			depthStencilInfo = other.depthStencilInfo;
+			dynamicStateEnables = other.dynamicStateEnables;
+			dynamicStateInfo = other.dynamicStateInfo;
+		}
 	};
 
 	struct ShaderPaths
@@ -107,8 +124,8 @@ namespace golem
 	private:
 		Device& m_device;
 		VkPipeline m_graphicsPipeline;
-		VkShaderModule m_vertShaderModule;
-		VkShaderModule m_fragShaderModule;
+		VkShaderModule m_vertShaderModule = NULL;
+		VkShaderModule m_fragShaderModule = NULL;
 
 		// Methods ********************************************************************************
 	public:
@@ -116,8 +133,16 @@ namespace golem
 			Device& device,
 			ShaderPaths shaderPaths,
 			const PipelineConfigInfo& configInfo,
-			const std::vector<VkVertexInputBindingDescription>& vertexBindingDesc,// = Model::Vertex::getBindingDescriptions(),
-			const std::vector<VkVertexInputAttributeDescription>& vertexAttribDesc);// = Model::Vertex::getAttributeDescriptions());
+			bool runtimeCompile = false);
+
+		Pipeline(
+			Device& device,
+			std::vector<uint32_t>&& vertShaderCode,
+			std::vector<uint32_t>&& fragShaderCode,
+			const PipelineConfigInfo& configInfo,
+			bool& success
+			);
+
 		~Pipeline();
 
 		REMOVE_COPY_CONSTRUCTOR(Pipeline)
@@ -126,25 +151,29 @@ namespace golem
 
 		void Bind(VkCommandBuffer commandBuffer);
 
-		static Pipeline* CreatePipeline(
-			const std::string& vert_filepath,
-			const std::string& frag_filepath,
-			const PipelineConfigInfo& configInfo,
-			const std::vector<VkVertexInputBindingDescription>& vertexBindingDesc,
-			const std::vector<VkVertexInputAttributeDescription>& vertexAttribDesc
-		);
+
 
 	private:
 		static std::vector<char> ReadFile(const std::string& filepath);
 
+		void BuildPipeline(
+			const PipelineConfigInfo& configInfo,
+			bool* success = nullptr);
+
 		void CreateGraphicsPipeline(
 			const std::string& vert_filepath,
 			const std::string& frag_filepath,
-			const PipelineConfigInfo& configInfo,
-			const std::vector<VkVertexInputBindingDescription>& vertexBindingDesc,// = Model::Vertex::getBindingDescriptions(),
-			const std::vector<VkVertexInputAttributeDescription>& vertexAttribDesc// = Model::Vertex::getAttributeDescriptions()
+			const PipelineConfigInfo& configInfo
 		);
 
+		void ReCreateGraphicsPipeline(
+			std::vector<uint32_t>&& vertShaderCode,
+			std::vector<uint32_t>&& fragShaderCode,
+			const PipelineConfigInfo& configInfo,
+			bool& success
+		);
+
+		bool CreateShaderModule(const std::vector<uint32_t>& code, VkShaderModule* shaderModule);
 		void CreateShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule);
 	};
 }

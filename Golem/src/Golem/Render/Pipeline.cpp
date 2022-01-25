@@ -1,6 +1,8 @@
 #include "golpch.h"
 #include "Pipeline.h"
 #include "../Application.h"
+#include "Objects/Vertex.h"
+//#include "Golem/Render/ShaderCompile.h"
 
 namespace golem
 {
@@ -8,16 +10,28 @@ namespace golem
 		Device& device,
 		ShaderPaths shaderPaths,
 		const PipelineConfigInfo& configInfo,
-		const std::vector<VkVertexInputBindingDescription>& vertexBindingDesc,
-		const std::vector<VkVertexInputAttributeDescription>& vertexAttribDesc)
+		bool runtimeCompile)
 		: m_device(device)
 	{
 		CreateGraphicsPipeline(
 			shaderPaths.vert_filepath,
 			shaderPaths.frag_filepath,
+			configInfo);
+	}
+
+	Pipeline::Pipeline(
+		Device& device,
+		std::vector<uint32_t>&& vertShaderCode,
+		std::vector<uint32_t>&& fragShaderCode,
+		const PipelineConfigInfo& configInfo,
+		bool& success)
+		: m_device(device)
+	{
+		ReCreateGraphicsPipeline(
+			std::move(vertShaderCode),
+			std::move(fragShaderCode),
 			configInfo,
-			vertexBindingDesc,
-			vertexAttribDesc);
+			success);
 	}
 
 	void Pipeline::DefaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
@@ -88,6 +102,9 @@ namespace golem
 		configInfo.dynamicStateInfo.pDynamicStates = configInfo.dynamicStateEnables.data();
 		configInfo.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
 		configInfo.dynamicStateInfo.flags = 0;
+
+		configInfo.vertexAttribDesc = Vertex::GetAttributeDescriptions();
+		configInfo.vertexBindingDesc = Vertex::GetBindingDescriptions();
 	}
 
 	void Pipeline::Bind(VkCommandBuffer commandBuffer)
@@ -108,8 +125,7 @@ namespace golem
 	{
 		std::ifstream file{ filepath, std::ios::ate | std::ios::binary };
 
-		if (!file.is_open())
-			throw std::runtime_error("failed to open file: " + filepath);
+		GOL_CORE_ASSERT(file.is_open(), "failed to open file: {0}", filepath);
 
 		size_t fileSize = static_cast<size_t>(file.tellg());
 		std::vector<char> buffer(fileSize);
@@ -122,33 +138,13 @@ namespace golem
 		return buffer;
 	}
 
-	golem::Pipeline* Pipeline::CreatePipeline(
-		const std::string& vert_filepath,
-		const std::string& frag_filepath,
-		const PipelineConfigInfo& configInfo,
-		const std::vector<VkVertexInputBindingDescription>& vertexBindingDesc,/* = Model::Vertex::getBindingDescriptions(), */ 
-		const std::vector<VkVertexInputAttributeDescription>& vertexAttribDesc/* = Model::Vertex::getAttributeDescriptions() */
-		)
-	{
-		return new golem::Pipeline(
-			Application::Get().GetDevice(),
-			{vert_filepath,frag_filepath},
-			configInfo,
-			vertexBindingDesc,
-			vertexAttribDesc
-		);
-	}
-
 	void Pipeline::CreateGraphicsPipeline(
 		const std::string& vert_filepath,
 		const std::string& frag_filepath,
-		const PipelineConfigInfo& configInfo,
-		const std::vector<VkVertexInputBindingDescription>& vertexBindingDesc,
-		const std::vector<VkVertexInputAttributeDescription>& vertexAttribDesc
-	)
+		const PipelineConfigInfo& configInfo)
 	{
-		assert(configInfo.pipelineLayout != VK_NULL_HANDLE && "cannot create graphics pipeline:: no pipelineLayout provided in configInfo");
-		assert(configInfo.renderPass != VK_NULL_HANDLE && "cannot create graphics pipeline:: no renderPass provided in configInfo");
+		GOL_CORE_ASSERT(configInfo.pipelineLayout != VK_NULL_HANDLE, "cannot create graphics pipeline:: no pipelineLayout provided in configInfo");
+		GOL_CORE_ASSERT(configInfo.renderPass != VK_NULL_HANDLE, "cannot create graphics pipeline:: no renderPass provided in configInfo");
 
 		auto vertCode = ReadFile(vert_filepath);
 		auto fragCode = ReadFile(frag_filepath);
@@ -156,6 +152,35 @@ namespace golem
 		CreateShaderModule(vertCode, &m_vertShaderModule);
 		CreateShaderModule(fragCode, &m_fragShaderModule);
 
+		BuildPipeline(configInfo);
+	}
+
+	void Pipeline::ReCreateGraphicsPipeline(
+		std::vector<uint32_t>&& vertShaderCode,
+		std::vector<uint32_t>&& fragShaderCode,
+		const PipelineConfigInfo& configInfo,
+		bool& success)
+	{
+		GOL_CORE_ASSERT(configInfo.pipelineLayout != VK_NULL_HANDLE, "cannot create graphics pipeline:: no pipelineLayout provided in configInfo");
+		GOL_CORE_ASSERT(configInfo.renderPass != VK_NULL_HANDLE, "cannot create graphics pipeline:: no renderPass provided in configInfo");
+
+		if(!CreateShaderModule(vertShaderCode, &m_vertShaderModule))
+		{
+			success = false;
+			return;
+		}
+
+		if (!CreateShaderModule(fragShaderCode, &m_fragShaderModule))
+		{
+			success = false;
+			return;
+		}
+
+		BuildPipeline(configInfo, &success);
+	}
+
+	void Pipeline::BuildPipeline(const PipelineConfigInfo& configInfo, bool* success)
+	{
 		// create array storing all pipeline stages
 		VkPipelineShaderStageCreateInfo shaderStages[2];
 
@@ -187,10 +212,10 @@ namespace golem
 
 		//auto bindingDescription = Model::Vertex::getBindingDescriptions();
 		//auto attributeDescriptions = Model::Vertex::getAttributeDescriptions();
-		vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(vertexBindingDesc.size());
-		vertexInputInfo.pVertexBindingDescriptions = vertexBindingDesc.data();
-		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexAttribDesc.size());
-		vertexInputInfo.pVertexAttributeDescriptions = vertexAttribDesc.data();
+		vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(configInfo.vertexBindingDesc.size());
+		vertexInputInfo.pVertexBindingDescriptions = configInfo.vertexBindingDesc.data();
+		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(configInfo.vertexAttribDesc.size());
+		vertexInputInfo.pVertexAttributeDescriptions = configInfo.vertexAttribDesc.data();
 
 		// create pipeline info struct
 		VkGraphicsPipelineCreateInfo pipelineInfo{};
@@ -216,21 +241,63 @@ namespace golem
 		pipelineInfo.basePipelineIndex = -1; // Optional
 
 		// create graphics pipeline
-		SAFE_RUN_VULKAN_FUNC(vkCreateGraphicsPipelines(m_device.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_graphicsPipeline), "failed to create graphics pipeline!");
+		if(success == nullptr)
+			SAFE_RUN_VULKAN_FUNC(vkCreateGraphicsPipelines(m_device.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_graphicsPipeline), "failed to create graphics pipeline!")
+		else
+		{
+			
+			auto result = vkCreateGraphicsPipelines(m_device.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_graphicsPipeline);
+			if (result != VK_SUCCESS)
+			{
+				GOL_CORE_ERROR("failed to create graphics pipeline!");
+				*success = false;
+				return;
+			}
+			*success = true;
+		}
+	}
+
+	bool Pipeline::CreateShaderModule(const std::vector<uint32_t>& code, VkShaderModule* shaderModule)
+	{
+		if(*shaderModule != NULL)
+		{
+			vkDestroyShaderModule(m_device, *shaderModule, nullptr);
+			*shaderModule = NULL;
+		}
+
+		VkShaderModuleCreateInfo createInfo{};
+		createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+		createInfo.codeSize = code.size()*sizeof(uint32_t);
+		createInfo.pCode = code.data();
+
+		//SAFE_RUN_VULKAN_FUNC(vkCreateShaderModule(m_device.device(), &createInfo, nullptr, shaderModule), "failed to create shader module");
+
+		{
+			auto result = vkCreateShaderModule(m_device.device(), &createInfo, nullptr, shaderModule); 
+			if(result != VK_SUCCESS)
+			{
+				GOL_CORE_ERROR("failed to create shader module");
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	void Pipeline::CreateShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule)
 	{
+		if (*shaderModule != NULL)
+		{
+			vkDestroyShaderModule(m_device, *shaderModule, nullptr);
+			*shaderModule = NULL;
+		}
+
 		VkShaderModuleCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 		createInfo.codeSize = code.size();
 		createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
 		SAFE_RUN_VULKAN_FUNC(vkCreateShaderModule(m_device.device(), &createInfo, nullptr, shaderModule), "failed to create shader module");
-
-		//if (vkCreateShaderModule(m_device.device(), &createInfo, nullptr, shaderModule) != VK_SUCCESS)
-		//{
-		//	throw std::runtime_error("failed to create shader module");
-		//}
 	}
+
 }

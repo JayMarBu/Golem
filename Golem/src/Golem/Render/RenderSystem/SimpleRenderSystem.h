@@ -12,7 +12,6 @@ namespace golem
 	public:
 		
 	private:
-
 		// Methods ********************************************************************************
 	public:
 		SimpleRenderSystem(
@@ -22,7 +21,7 @@ namespace golem
 			const std::string& vert_filepath,
 			const std::string& frag_filepath
 		);
-		~SimpleRenderSystem();
+		virtual ~SimpleRenderSystem();
 
 		REMOVE_COPY_CONSTRUCTOR(SimpleRenderSystem);
 

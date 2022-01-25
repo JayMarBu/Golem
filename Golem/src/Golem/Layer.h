@@ -19,7 +19,8 @@ namespace golem
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
-		virtual void OnUpdate(VkCommandBuffer commandBuffer) {}
+		virtual void OnPostRender() {}
+		virtual void OnRender(VkCommandBuffer commandBuffer) {}
 		virtual void OnImGuiRender() {}
 		virtual void OnEvent(Event& e) {}
 
