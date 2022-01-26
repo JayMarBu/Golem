@@ -54,7 +54,7 @@ public:
 		std::shared_ptr<golem::Model> cubeModel = golem::Model::CreateModelFromPrimative(device, golem::Primitives::Cube, false);
 		auto cube = golem::TempGameObject::Create();
 		cube.model = cubeModel;
-		cube.transform.translation = { 1.5f,0.f,-.01f };
+		cube.transform.translation = { 1.5f,0.f,0 };
 		m_gameObjects.push_back(std::move(cube));
 
 		std::shared_ptr<golem::Model> quadModel = golem::Model::CreateModelFromPrimative(device, golem::Primitives::Quad);
@@ -67,7 +67,7 @@ public:
 		std::shared_ptr<golem::Model> vaseModel = golem::Model::CreateModelFromFile(device, "models/smooth_vase.obj");
 		auto vase = golem::TempGameObject::Create();
 		vase.model = vaseModel;
-		vase.transform.translation = { -1.5f,0.5f,-.01f };
+		vase.transform.translation = { -1.5f,0.5f,0 };
 		vase.transform.scale = {5,5,5};
 		m_gameObjects.push_back(std::move(vase));
 

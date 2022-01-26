@@ -12,150 +12,121 @@ namespace golem
 		{
 			const float u = 0.5f;
 
-			// indices cube
-			if (indices)
+			enum POS : int
 			{
-				//TODO: figure out tex coords
-				*vertices = {
-				{{-u, -u, -u},	COLOUR_WHITE, NORMAL(-1,-1,-1),	{0,0}}, // 0
-				{{u, -u, -u},	COLOUR_WHITE, NORMAL(1,-1,-1),	{0,0}}, // 1
-				{{-u, u, -u},	COLOUR_WHITE, NORMAL(-1,1,-1),	{0,0}}, // 2
-				{{u, u, -u},	COLOUR_WHITE, NORMAL(1,1,-1),	{0,0}}, // 3
-				{{-u, -u, u},	COLOUR_WHITE, NORMAL(-1,-1,1),	{0,0}}, // 4
-				{{u, -u, u},	COLOUR_WHITE, NORMAL(1,-1,1),	{0,0}}, // 5
-				{{-u, u, u},	COLOUR_WHITE, NORMAL(-1,1,1),	{0,0}}, // 6
-				{{u, u, u},		COLOUR_WHITE, NORMAL(1,1,1),	{0,0}}  // 7
-				};
+				R_U_B = 0,
+				R_D_B = 1,
+				R_U_F = 2,
+				R_D_F = 3,
+				L_U_B = 4,
+				L_D_B = 5,
+				L_U_F = 6,
+				L_D_F = 7,
+			};
 
-				*indices = {
-					// front face
-					0,3,2,
-					0,1,3,
-
-					// bottom face
-					2,7,6,
-					2,3,7,
-
-					// back face
-					6,5,4,
-					6,7,5,
-
-					// top face
-					4,1,0,
-					4,5,1,
-
-					// left face
-					4,2,6,
-					4,0,2,
-
-					// right face
-					1,7,3,
-					1,5,7
-				};
-			}
-
-			// texture friendly cube
-			else
+			glm::vec3 pos[]
 			{
-				*vertices = {
-	#pragma region  // ****** Top face ******
-					// 1
-					// |\
-					// 3-2
-					{{-u, -u, u},	COLOUR_WHITE, NORMAL(0,-1,0),	{0,0}},
-					{{u, -u, -u},	COLOUR_WHITE, NORMAL(0,-1,0),	{1,1}},
-					{{-u, -u, -u},	COLOUR_WHITE, NORMAL(0,-1,0),	{0,1}},
+				{ u, -u,  u},
+				{ u,  u,  u},
+				{ u, -u, -u},
+				{ u,  u, -u},
+				{-u, -u,  u},
+				{-u,  u,  u},
+				{-u, -u, -u},
+				{-u,  u, -u}
+			};
 
-					// 1-2 
-					//  \|
-					//   3
-					{{-u, -u, u},	COLOUR_WHITE, NORMAL(0,-1,0),	{0,0}},
-					{{u, -u, u},	COLOUR_WHITE, NORMAL(0,-1,0),	{1,0}},
-					{{u, -u, -u},	COLOUR_WHITE, NORMAL(0,-1,0),	{1,1}},
-	#pragma endregion
+			enum UVS : int
+			{
+				TL = 0,
+				TR = 1,
+				BL = 2,
+				BR = 3
+			};
 
-	#pragma region  // ****** Front face ******
-					// 1
-					// |\
-					// 3-2
-					{{-u, -u, -u},	COLOUR_WHITE, NORMAL(0,0,1),	{0,0}},
-					{{u, u, -u},	COLOUR_WHITE, NORMAL(0,0,1),	{1,1}},
-					{{-u, u, -u},	COLOUR_WHITE, NORMAL(0,0,1),	{0,1}},
+			glm::vec2 uv[]
+			{
+				{0, 0}, {1, 0},
+				{0, 1}, {1, 1}
+			};
 
-					// 1-2 
-					//  \|
-					//   3
-					{{-u, -u, -u},	COLOUR_WHITE, NORMAL(0,0,1),	{0,0}},
-					{{u, -u, -u},	COLOUR_WHITE, NORMAL(0,0,1),	{1,0}},
-					{{u, u, -u},	COLOUR_WHITE, NORMAL(0,0,1),	{1,1}},
-	#pragma endregion
+			enum NORMALS : int
+			{
+				U	= 0,
+				F	= 1,
+				L	= 2,
+				D	= 3,
+				R	= 4,
+				B	= 5
+			};
 
-	#pragma region  // ****** Bottom face ******
-					// 1
-					// |\
-					// 3-2
-					{{-u, u, -u},	COLOUR_WHITE, NORMAL(0,1,0),	{0,0}},
-					{{u, u, u},		COLOUR_WHITE, NORMAL(0,1,0),	{1,1}},
-					{{-u, u, u},	COLOUR_WHITE, NORMAL(0,1,0),	{0,1}},
+			glm::vec3 norm[]
+			{
+				{ 0.0, -1.0,  0.0},
+				{ 0.0,  0.0, -1.0},
+				{-1.0,  0.0,  0.0},
+				{ 0.0,  1.0,  0.0},
+				{ 1.0,  0.0,  0.0},
+				{ 0.0,  0.0,  1.0}
+			};
 
-					// 1-2 
-					//  \|
-					//   3
-					{{-u, u, -u},	COLOUR_WHITE, NORMAL(0,1,0),	{0,0}},
-					{{u, u, -u},	COLOUR_WHITE, NORMAL(0,1,0),	{1,0}},
-					{{u, u, u},		COLOUR_WHITE, NORMAL(0,1,0),	{1,1}},
-	#pragma endregion
+			*vertices =
+			{
+				// Up face
+				{pos[L_U_B], COLOUR_WHITE, norm[U], uv[TL]},
+				{pos[R_U_F], COLOUR_WHITE, norm[U], uv[BR]},
+				{pos[R_U_B], COLOUR_WHITE, norm[U], uv[TR]},
 
-	#pragma region  // ****** Back face ******
-					//   1
-					//  /|
-					// 2-3
-					{{-u, -u, u},	COLOUR_WHITE, NORMAL(0,0,1),	{1,0}},
-					{{u, u, u},		COLOUR_WHITE, NORMAL(0,0,1),	{0,1}},
-					{{-u, u, u},	COLOUR_WHITE, NORMAL(0,0,1),	{1,1}},
+				{pos[L_U_B], COLOUR_WHITE, norm[U], uv[TL]},
+				{pos[L_U_F], COLOUR_WHITE, norm[U], uv[BL]},
+				{pos[R_U_F], COLOUR_WHITE, norm[U], uv[BR]},
 
-					// 3-1 
-					// |/
-					// 2
-					{{-u, -u, u},	COLOUR_WHITE, NORMAL(0,0,1),	{1,0}},
-					{{u, -u, u},	COLOUR_WHITE, NORMAL(0,0,1),	{0,0}},
-					{{u, u, u},		COLOUR_WHITE, NORMAL(0,0,1),	{0,1}},
-	#pragma endregion
+				// Front face
+				{pos[R_U_F], COLOUR_WHITE, norm[F], uv[TR]},
+				{pos[L_D_F], COLOUR_WHITE, norm[F], uv[BL]},
+				{pos[R_D_F], COLOUR_WHITE, norm[F], uv[BR]},
 
-	#pragma region  // ****** Left face ******
-					// 1
-					// |\
-					// 3-2
-					{{-u, -u, u},	COLOUR_WHITE, NORMAL(-1,0,0),	{0,0}},
-					{{-u, u, -u},	COLOUR_WHITE, NORMAL(-1,0,0),	{1,1}},
-					{{-u, u, u},	COLOUR_WHITE, NORMAL(-1,0,0),	{0,1}},
+				{pos[L_U_F], COLOUR_WHITE, norm[F], uv[TL]},
+				{pos[L_D_F], COLOUR_WHITE, norm[F], uv[BL]},
+				{pos[R_U_F], COLOUR_WHITE, norm[F], uv[TR]},
 
-					// 1-2 
-					//  \|
-					//   3
-					{{-u, -u, u},	COLOUR_WHITE, NORMAL(-1,0,0),	{0,0}},
-					{{-u, -u, -u},	COLOUR_WHITE, NORMAL(-1,0,0),	{1,0}},
-					{{-u, u, -u},	COLOUR_WHITE, NORMAL(-1,0,0),	{1,1}},
-	#pragma endregion
+				// Down face
+				{pos[L_D_F], COLOUR_WHITE, norm[D], uv[TL]},
+				{pos[L_D_B], COLOUR_WHITE, norm[D], uv[BL]},
+				{pos[R_D_F], COLOUR_WHITE, norm[D], uv[TR]},
 
-	#pragma region  // ****** Right face ******
-					// 1
-					// |\
-					// 3-2
-					{{u, -u, -u},	COLOUR_WHITE, NORMAL(1,0,0),	{0,0}},
-					{{u, u, u},		COLOUR_WHITE, NORMAL(1,0,0),	{1,1}},
-					{{u, u, -u},	COLOUR_WHITE, NORMAL(1,0,0),	{0,1}},
+				{pos[R_D_F], COLOUR_WHITE, norm[D], uv[TR]},
+				{pos[L_D_B], COLOUR_WHITE, norm[D], uv[BL]},
+				{pos[R_D_B], COLOUR_WHITE, norm[D], uv[BR]},
 
-					// 1-2 
-					//  \|
-					//   3
-					{{u, -u, -u},	COLOUR_WHITE, NORMAL(1,0,0),	{0,0}},
-					{{u, -u, u},	COLOUR_WHITE, NORMAL(1,0,0),	{1,0}},
-					{{u, u, u},		COLOUR_WHITE, NORMAL(1,0,0),	{1,1}},
-	#pragma endregion
-				};
-			}
+				// Back face
+				{pos[L_U_B], COLOUR_WHITE, norm[B], uv[TR]},
+				{pos[R_D_B], COLOUR_WHITE, norm[B], uv[BL]},
+				{pos[L_D_B], COLOUR_WHITE, norm[B], uv[BR]},
 
+				{pos[R_U_B], COLOUR_WHITE, norm[B], uv[TL]},
+				{pos[R_D_B], COLOUR_WHITE, norm[B], uv[BL]},
+				{pos[L_U_B], COLOUR_WHITE, norm[B], uv[TR]},
+
+				// Left face
+				{pos[L_U_B], COLOUR_WHITE, norm[L], uv[TL]},
+				{pos[L_D_B], COLOUR_WHITE, norm[L], uv[BL]},
+				{pos[L_D_F], COLOUR_WHITE, norm[L], uv[BR]},
+
+				{pos[L_U_B], COLOUR_WHITE, norm[L], uv[TL]},
+				{pos[L_D_F], COLOUR_WHITE, norm[L], uv[BR]},
+				{pos[L_U_F], COLOUR_WHITE, norm[L], uv[TR]},
+
+				// Right face
+				{pos[R_U_F], COLOUR_WHITE, norm[R], uv[TL]},
+				{pos[R_D_F], COLOUR_WHITE, norm[R], uv[BL]},
+				{pos[R_D_B], COLOUR_WHITE, norm[R], uv[BR]},
+
+				{pos[R_U_F], COLOUR_WHITE, norm[R], uv[TL]},
+				{pos[R_D_B], COLOUR_WHITE, norm[R], uv[BR]},
+				{pos[R_U_B], COLOUR_WHITE, norm[R], uv[TR]},
+					
+			};
 		}
 
 		void Quad(std::vector<Vertex>* vertices, std::vector<uint32_t>* indices, glm::vec3 colour /*= { 1,1,1 }*/)
@@ -164,16 +135,38 @@ namespace golem
 
 			if (indices)
 			{
+				enum UV : int
+				{
+					TL = 0,
+					TR = 1,
+					BL = 2,
+					BR = 3
+				};
+
+				glm::vec2 uv[]
+				{
+					{0, 0}, {1, 0},
+					{0, 1}, {1, 1}
+				};
+
+				glm::vec3 pos[]
+				{
+					{-u, 0,  u},
+					{ u, 0,  u},
+					{-u, 0, -u},
+					{ u, 0, -u}
+				};
+
 				*vertices = {
-				{{-u, 0.0, -u},	COLOUR_WHITE, NORMAL(0,-1,0),	{0,0}}, // 0
-				{{-u, 0.0, u},	COLOUR_WHITE, NORMAL(0,-1,0),	{0,1}}, // 1
-				{{u, 0.0, u},	COLOUR_WHITE, NORMAL(0,-1,0),	{1,1}}, // 2
-				{{u, 0.0, -u},	COLOUR_WHITE, NORMAL(0,-1,0),	{1,0}}  // 3
+				{pos[TL],	COLOUR_WHITE, NORMAL(0,-1,0),	uv[TL]}, // 0
+				{pos[TR],	COLOUR_WHITE, NORMAL(0,-1,0),	uv[TR]}, // 1
+				{pos[BL],	COLOUR_WHITE, NORMAL(0,-1,0),	uv[BL]}, // 2
+				{pos[BR],	COLOUR_WHITE, NORMAL(0,-1,0),	uv[BR]}  // 3
 				};
 
 				*indices = {
-					0,2,1,
-					2,0,3,
+					TL,BL,TR,
+					TR,BL,BR,
 				};
 
 				return;
