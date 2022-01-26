@@ -19,7 +19,7 @@ namespace golem
 		std::unique_ptr<Window> m_window;
 		std::unique_ptr<Device> m_device;
 		std::unique_ptr<golem::Renderer> m_renderer;
-		ThreadPool m_threadPool{32};
+		ThreadPool m_threadPool{8};
 
 		// Temp stuff ---------------------------------------------------------
 		std::unique_ptr<TextureManager> m_textureManager;
@@ -30,6 +30,8 @@ namespace golem
 
 		bool m_isRunning = true;
 		LayerStack m_layerStack;
+
+		std::mutex m_eventMutex;
 	private:
 		static Application* s_instance;
 		// Methods ********************************************************************************

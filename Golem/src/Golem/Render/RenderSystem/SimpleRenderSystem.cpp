@@ -9,34 +9,17 @@ namespace golem
 		glm::mat4 normalMatrix{ 1.f };
 	};
 
-	SimpleRenderSystem::SimpleRenderSystem(
-		Device& _device,
-		VkRenderPass _renderPass,
-		VkDescriptorSetLayout descriptorSet,
-		const std::string& vert_filepath,
-		const std::string& frag_filepath
-		)
+	SimpleRenderSystem::SimpleRenderSystem(Device& _device, VkDescriptorSetLayout descriptorSet)
 		: RenderSystemBase(_device)
 	{
-		CreatePipelineLayout(descriptorSet, sizeof(SimplePushConstantData));
+		CreatePipelineLayout(descriptorSet, sizeof(SimplePushConstantData), VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT);
 
-		ShaderPaths shaderPaths{};
+		m_shaderPaths.vert_filepath = "shaders/simple_shader/simple_shader.vert";
+		m_shaderPaths.frag_filepath = "shaders/simple_shader/simple_shader.frag";
 
-		shaderPaths.vert_filepath = vert_filepath;
-		//shaderPaths.vert_filepath = "shaders/simple_shader/simple_shader.vert.spv";
-		shaderPaths.frag_filepath = frag_filepath;
-		//shaderPaths.frag_filepath = "shaders/simple_shader/simple_shader.frag.spv";
-
-
-		//PipelineConfigInfo pipelineConfig{};
 		Pipeline::DefaultPipelineConfigInfo(m_configInfo);
 
-		CreatePipeline(_renderPass, shaderPaths, m_configInfo);
-	}
-
-	SimpleRenderSystem::~SimpleRenderSystem()
-	{
-		//vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
+		CreatePipeline();
 	}
 
 	void SimpleRenderSystem::RenderGameObjects(FrameInfo& fInfo, std::vector<TempGameObject>& gameObjects)
@@ -54,11 +37,12 @@ namespace golem
 
 		for (auto& obj : gameObjects)
 		{
-			//obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + (1.f*fInfo.frameTime), glm::two_pi<float>());
-			//obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + (0.1f* fInfo.frameTime), glm::two_pi<float>());
-
+			
 			if(obj.model == nullptr)
 				continue;
+			
+			//obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + (1.f * fInfo.frameTime), glm::two_pi<float>());
+			//obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + (0.1f * fInfo.frameTime), glm::two_pi<float>());
 
 			SimplePushConstantData pushData{};
 
@@ -77,6 +61,28 @@ namespace golem
 			obj.model->Bind(fInfo.commandBuffer);
 			obj.model->Draw(fInfo.commandBuffer);
 		}
+	}
+
+	void SimpleRenderSystem::CreatePipelineLayout(
+		VkDescriptorSetLayout descriptorSet,
+		uint32_t pushConstantSize,
+		VkShaderStageFlags pushConstantShaderStages /* = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT */)
+	{
+		VkPushConstantRange pushConstantRange{};
+		pushConstantRange.stageFlags = pushConstantShaderStages;
+		pushConstantRange.offset = 0;
+		pushConstantRange.size = pushConstantSize;
+
+		std::vector<VkDescriptorSetLayout> descriptorSetLayouts{ descriptorSet };
+
+		VkPipelineLayoutCreateInfo pipelineCreateInfo{};
+		pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+		pipelineCreateInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());
+		pipelineCreateInfo.pSetLayouts = descriptorSetLayouts.data();
+		pipelineCreateInfo.pushConstantRangeCount = 1;
+		pipelineCreateInfo.pPushConstantRanges = &pushConstantRange;
+
+		SAFE_RUN_VULKAN_FUNC(vkCreatePipelineLayout(m_device, &pipelineCreateInfo, nullptr, &m_pipelineLayout), "failed to create pipelineLayout");
 	}
 
 }

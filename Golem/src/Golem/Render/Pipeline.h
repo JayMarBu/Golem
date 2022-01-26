@@ -94,19 +94,6 @@ namespace golem
 
 		VkRenderPass renderPass = nullptr;
 		uint32_t subpass = 0;
-
-		void SetData(PipelineConfigInfo& other)
-		{
-			viewportInfo = other.viewportInfo;
-			inputAssemblyInfo = other.inputAssemblyInfo;
-			rasterizationInfo = other.rasterizationInfo;
-			multisampleInfo = other.multisampleInfo;
-			colorBlendAttachment = other.colorBlendAttachment;
-			colorBlendInfo = other.colorBlendInfo;
-			depthStencilInfo = other.depthStencilInfo;
-			dynamicStateEnables = other.dynamicStateEnables;
-			dynamicStateInfo = other.dynamicStateInfo;
-		}
 	};
 
 	struct ShaderPaths
@@ -150,8 +137,6 @@ namespace golem
 		static void DefaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
 
 		void Bind(VkCommandBuffer commandBuffer);
-
-
 
 	private:
 		static std::vector<char> ReadFile(const std::string& filepath);

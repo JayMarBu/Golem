@@ -2,6 +2,7 @@
 #include "RenderSystemBase.h"
 #include "../ShaderCompile.h"
 #include "Golem/Application.h"
+#include "Golem/Events/RenderSystemEvents.h"
 //#include "../ShaderCompile.h"
 
 namespace golem
@@ -12,90 +13,74 @@ namespace golem
 		vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
 	}
 
-	void RenderSystemBase::CreatePipelineLayout(
-		VkDescriptorSetLayout descriptorSet,
-		uint32_t pushConstantSize,
-		VkShaderStageFlags pushConstantShaderStages)
-	{
-		VkPushConstantRange pushConstantRange{};
-		pushConstantRange.stageFlags = pushConstantShaderStages;
-		pushConstantRange.offset = 0;
-		pushConstantRange.size = pushConstantSize;
-
-		std::vector<VkDescriptorSetLayout> descriptorSetLayouts{ descriptorSet };
-
-		VkPipelineLayoutCreateInfo pipelineCreateInfo{};
-		pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipelineCreateInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());
-		pipelineCreateInfo.pSetLayouts = descriptorSetLayouts.data();
-		if (pushConstantSize > 0)
-		{
-			pipelineCreateInfo.pushConstantRangeCount = 1;
-			pipelineCreateInfo.pPushConstantRanges = &pushConstantRange;
-		}
-		else
-		{
-			pipelineCreateInfo.pushConstantRangeCount = 0;
-			pipelineCreateInfo.pPushConstantRanges = nullptr;
-		}
-
-		SAFE_RUN_VULKAN_FUNC(vkCreatePipelineLayout(m_device, &pipelineCreateInfo, nullptr, &m_pipelineLayout), "failed to create pipelineLayout");
-	}
-
-	void RenderSystemBase::CreatePipeline(
-		VkRenderPass renderPass,
-		ShaderPaths shaderPaths,
-		PipelineConfigInfo& pipelineConfig,
-		const std::vector<VkVertexInputBindingDescription>& vertexBindingDesc,
-		const std::vector<VkVertexInputAttributeDescription>& vertexAttribDesc)
+	void RenderSystemBase::CreatePipeline()
 	{
 		GOL_CORE_ASSERT(m_pipelineLayout != nullptr, "cannot create pipeline before pipeline layout");
 
-		pipelineConfig.renderPass = renderPass;
-		pipelineConfig.pipelineLayout = m_pipelineLayout;
+		m_configInfo.renderPass = Application::Get().GetRenderer().GetSwapChainRenderPass();
+		m_configInfo.pipelineLayout = m_pipelineLayout;
+
+		ShaderPaths sPaths{};
+
+		sPaths.vert_filepath = SPVShaderPath(m_shaderPaths.vert_filepath);
+		sPaths.frag_filepath = SPVShaderPath(m_shaderPaths.frag_filepath);
 
 		m_pipeline = std::make_unique<Pipeline>(
 			m_device,
-			shaderPaths,
-			pipelineConfig
+			sPaths,
+			m_configInfo
 		);
 	}
 
-	void RenderSystemBase::RuntimeCreatePipeline(
-		VkRenderPass renderPass,
-		ShaderPaths shaderPaths)
+	void RenderSystemBase::EndRecompilation(bool success)
 	{
-		if(isRegenerating)
+		if (!success)
+		{
+			CLEANUP(m_newPipeline);
+			m_newPipeline = nullptr;
+			SetBothRegenerationFlags(false, false);
+			GOL_CORE_ERROR("Pipeline reconstruction has failed");
+			return;
+		}
+
+		SetBothRegenerationFlags(false, true);
+		GOL_CORE_INFO("Pipeline reconstruction has succeeded");
+
+		golem::ShaderReCompileEvent* e = new golem::ShaderReCompileEvent(this);
+		golem::Application::Get().GetThreadPool().FireEvent(e);
+	}
+
+	std::string RenderSystemBase::SPVShaderPath(std::string& path)
+	{
+		std::stringstream ss;
+		ss << path << ".spv";
+		return ss.str();
+	}
+
+	void RenderSystemBase::RuntimeCreatePipeline()
+	{
+		if(IsRegenerating())
 			return;
 		
 		GOL_CORE_ASSERT(m_pipelineLayout != nullptr, "cannot create pipeline before pipeline layout");
 
-		{
-			std::unique_lock<std::mutex> lock{ m_regenerationMutex };
-			isRegenerating = true;
-		}
+		SetIsRegenerating(true);
 
 		std::vector<uint32_t> vertCode{};
-		if(!CompileShader(shaderPaths.vert_filepath, shaderc_shader_kind::shaderc_glsl_vertex_shader, vertCode)) 
+		if(!CompileShader(m_shaderPaths.vert_filepath, shaderc_shader_kind::shaderc_glsl_vertex_shader, vertCode)) 
 		{
-			{
-				std::unique_lock<std::mutex> lock{ m_regenerationMutex };
-				isRegenerating = false;
-			}
+			SetIsRegenerating(false);
 			return;
 		}
 
 		std::vector<uint32_t> fragCode{};
-		if (!CompileShader(shaderPaths.frag_filepath, shaderc_shader_kind::shaderc_glsl_fragment_shader, fragCode))
+		if (!CompileShader(m_shaderPaths.frag_filepath, shaderc_shader_kind::shaderc_glsl_fragment_shader, fragCode))
 		{
-			{
-				std::unique_lock<std::mutex> lock{ m_regenerationMutex };
-				isRegenerating = false;
-			}
+			SetIsRegenerating(false);
 			return;
 		}
 
-		m_configInfo.renderPass = renderPass;
+		m_configInfo.renderPass = Application::Get().GetRenderer().GetSwapChainRenderPass();
 		m_configInfo.pipelineLayout = m_pipelineLayout;
 
 		bool success = false;
@@ -108,39 +93,13 @@ namespace golem
 			success
 		);
 
-		if(success)
-		{
-			{
-				std::unique_lock<std::mutex> lock{ m_regenerationMutex };
-				hasRegenerated = true;
-				isRegenerating = false;
-			}
-
-			//CompleteRegeneration();
-
-			GOL_CORE_INFO("Pipeline reconstruction has succeeded");
-
-		}
-		else
-		{
-			CLEANUP(m_newPipeline);
-			m_newPipeline = nullptr;
-			{
-				std::unique_lock<std::mutex> lock{ m_regenerationMutex };
-				isRegenerating = false;
-				hasRegenerated = false;
-			}
-			GOL_CORE_ERROR("Pipeline reconstruction has failed");
-		}
+		EndRecompilation(success);
 	}
 
 	void RenderSystemBase::CompleteRegeneration()
 	{
 		vkDeviceWaitIdle(Application::Get().GetDevice());
-		{
-			std::unique_lock<std::mutex> lock{ m_regenerationMutex };
-			hasRegenerated = false;
-		}
+		SetHasRegenerated(false);
 
 		m_pipeline.reset(m_newPipeline);
 		m_newPipeline = nullptr;

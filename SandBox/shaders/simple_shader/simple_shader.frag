@@ -47,5 +47,6 @@ void main()
 		diffuseLight += intensity * max(dot(surfaceNormal, normalize(directionToLight)),0);
 	}
 
+	//outColour = vec4(1.0,0,0, 1.0);
 	outColour = vec4(diffuseLight * inColour, 1.0)*texture(texSampler, inTexCoord);
 }

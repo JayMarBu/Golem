@@ -10,34 +10,20 @@ namespace golem
 		float radius;
 	};
 
-	PointLightRenderSystem::PointLightRenderSystem(
-		Device& _device,
-		VkRenderPass _renderPass,
-		VkDescriptorSetLayout descriptorSet)
+	PointLightRenderSystem::PointLightRenderSystem(Device& _device, VkDescriptorSetLayout descriptorSet)
 		: RenderSystemBase(_device)
 	{
 		CreatePipelineLayout(descriptorSet, sizeof(PointLightPushConstant));
 
-		ShaderPaths shaderPaths{};
+		m_shaderPaths.vert_filepath = "shaders/point_light_shader/point_light_shader.vert";
+		m_shaderPaths.frag_filepath = "shaders/point_light_shader/point_light_shader.frag";
 
-		shaderPaths.vert_filepath = "shaders/point_light_shader/point_light_shader.vert.spv";
-		//shaderPaths.vert_filepath = "shaders/simple_shader/simple_shader.vert.spv";
-		shaderPaths.frag_filepath = "shaders/point_light_shader/point_light_shader.frag.spv";
-		//shaderPaths.frag_filepath = "shaders/simple_shader/simple_shader.frag.spv";
-
-
-		//PipelineConfigInfo pipelineConfig{};
 		Pipeline::DefaultPipelineConfigInfo(m_configInfo);
 
 		m_configInfo.vertexAttribDesc.clear();
 		m_configInfo.vertexBindingDesc.clear();
 
-		CreatePipeline(_renderPass, shaderPaths, m_configInfo);
-	}
-
-	PointLightRenderSystem::~PointLightRenderSystem()
-	{
-		//vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
+		CreatePipeline();
 	}
 
 	void PointLightRenderSystem::Update(FrameInfo& fInfo, GlobalUBO& ubo, std::vector<TempGameObject>& gameObjects)

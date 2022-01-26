@@ -3,6 +3,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <future>
+#include "Golem/Events/Event.h"
 
 namespace golem
 {
@@ -20,6 +21,9 @@ namespace golem
 		bool m_stopping = false;
 
 		std::queue<Task> m_tasks;
+
+		std::mutex m_gEventMutex;
+		std::queue<Event*> m_events;
 		// Methods ********************************************************************************
 	public:
 		explicit ThreadPool(std::size_t numThreads);
@@ -32,6 +36,9 @@ namespace golem
 		auto Enqueue(Task task)->std::future<decltype(task())>;
 
 		void Enqueue(Task task);
+
+		void PollEvents();
+		void FireEvent(Event* e);
 
 	private:
 		void Start(std::size_t numThreads);

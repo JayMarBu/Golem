@@ -16,10 +16,9 @@ namespace golem
 	public:
 		PointLightRenderSystem(
 			Device& _device,
-			VkRenderPass _renderPass,
 			VkDescriptorSetLayout descriptorSet
 		);
-		virtual ~PointLightRenderSystem();
+		virtual ~PointLightRenderSystem(){}
 
 
 		REMOVE_COPY_CONSTRUCTOR(PointLightRenderSystem);

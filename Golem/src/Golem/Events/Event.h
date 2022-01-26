@@ -13,7 +13,8 @@ namespace golem
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
 		AppTick, AppUpdate, AppRender,
 		KeyPressed, KeyReleased, KeyTyped,
-		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
+		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled,
+		ShaderRecompiled
 	};
 
 	enum EventCategory
@@ -23,7 +24,8 @@ namespace golem
 		EventCategory_Input			= BIT(1),
 		EventCategory_Keyboard		= BIT(2),
 		EventCategory_Mouse			= BIT(3),
-		EventCategory_MouseButton	= BIT(4)
+		EventCategory_MouseButton	= BIT(4),
+		EventCategory_RenderSystem	= BIT(5)
 	};
 
 	// ********************************************************************************************//

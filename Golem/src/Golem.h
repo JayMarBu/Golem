@@ -10,6 +10,7 @@
 #include "Golem/Input/MouseButtonCodes.h"
 #include "Golem/Input/KeyCodes.h"
 #include "Golem/Events/Event.h"
+#include "Golem/ThreadPool.h"
 
 // Rendering **************************************************************************************
 #include "Golem/Render/Buffer.h"

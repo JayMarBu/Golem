@@ -1,5 +1,6 @@
 #include "golpch.h"
 #include "ThreadPool.h"
+#include "Application.h"
 
 namespace golem
 {
@@ -22,6 +23,25 @@ namespace golem
 		}
 
 		m_eventVar.notify_one();
+	}
+
+	void ThreadPool::PollEvents()
+	{
+		std::unique_lock<std::mutex> lock{m_gEventMutex};
+
+		while (!m_events.empty())
+		{
+			auto e = std::move(m_events.front());
+			m_events.pop();
+			Application::Get().OnEvent(*e);
+			CLEANUP(e);
+		}
+	}
+
+	void ThreadPool::FireEvent(Event* e)
+	{
+		std::unique_lock<std::mutex> lock{ m_gEventMutex };
+		m_events.emplace(e);
 	}
 
 	void ThreadPool::Start(std::size_t numThreads)
@@ -62,6 +82,17 @@ namespace golem
 		for (auto& thread : m_threads )
 		{
 			thread.join();
+		}
+
+		{
+			std::unique_lock<std::mutex> lock{ m_gEventMutex };
+
+			while (!m_events.empty())
+			{
+				auto e = std::move(m_events.front());
+				m_events.pop();
+				CLEANUP(e);
+			}
 		}
 	}
 

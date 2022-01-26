@@ -41,6 +41,7 @@ namespace golem
 		while(m_isRunning)
 		{
 			m_window->OnUpdate();
+			m_threadPool.PollEvents();
 
 			auto commandBuffer = m_renderer->BeginFrame();
 			if (!commandBuffer)
@@ -71,6 +72,8 @@ namespace golem
 
 	void Application::OnEvent(Event& e)
 	{
+		std::unique_lock<std::mutex> lock{m_eventMutex};
+
 		EventDispatcher dispatcher(e);
 
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUNC(Application::OnWindowClose));

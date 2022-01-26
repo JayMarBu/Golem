@@ -5,6 +5,7 @@
 
 #include "Golem/Render/RenderSystem/SimpleRenderSystem.h"
 #include "Golem/Render/RenderSystem/PointLightRenderSystem.h"
+#include "Golem/Events/RenderSystemEvents.h"
 
 using golem::Application;
 
@@ -16,8 +17,6 @@ struct CameraWrapper
 	golem::TempGameObject gObject;
 	golem::KeyboardMovementController controller{};
 };
-
-
 
 class ExampleLayer : public golem::Layer
 {
@@ -135,35 +134,24 @@ public:
 		// init render systems
 		m_simpleRenderSystem = std::make_unique<golem::SimpleRenderSystem>(
 			device,
-			golem::Application::Get().GetRenderer().GetSwapChainRenderPass(),
-			m_globalSetLayout->GetDescriptorSetLayout(),
-			"shaders/simple_shader/simple_shader.vert.spv",
-			"shaders/simple_shader/simple_shader.frag.spv");
+			m_globalSetLayout->GetDescriptorSetLayout());
 
 		m_pointLightRenderSystem = std::make_unique<golem::PointLightRenderSystem>(
 			device,
-			golem::Application::Get().GetRenderer().GetSwapChainRenderPass(),
 			m_globalSetLayout->GetDescriptorSetLayout());
+
+		GOL_TRACE("{0}", sizeof(golem::Pipeline));
+		GOL_TRACE("{0}", sizeof(golem::Device&));
 	}
 
 	void OnPostRender() override
 	{
-		if(m_simpleRenderSystem->HasRegenerated())
-		{
-			m_simpleRenderSystem->CompleteRegeneration();
-		}
-
-		if (m_pointLightRenderSystem->HasRegenerated())
-		{
-			m_pointLightRenderSystem->CompleteRegeneration();
-		}
+		
 	}
 
 	void OnRender(VkCommandBuffer commandBuffer) override
 	{
 		m_timer.frame();
-
-		
 
 		// ------ update camera ------
 		m_camera.controller.MoveInPlaneXZ(m_timer.getTime(), m_camera.gObject);
@@ -203,34 +191,12 @@ public:
 
 		if (ImGui::Button("Recompile Simple Shader") && !m_simpleRenderSystem->IsRegenerating())
 		{
-			golem::ThreadPool::Task task = [=] 
-			{
-				m_simpleRenderSystem->RuntimeCreatePipeline
-				(
-				golem::Application::Get().GetRenderer().GetSwapChainRenderPass(),
-				{
-					"shaders/simple_shader/simple_shader.vert",
-					"shaders/simple_shader/simple_shader.frag"
-				});
-			};
-
-			Application::Get().GetThreadPool().Enqueue(task);
+			Application::Get().GetThreadPool().Enqueue([=]{m_simpleRenderSystem->RuntimeCreatePipeline();});
 		}
 
 		if (ImGui::Button("Recompile Point Light Shader") && !m_pointLightRenderSystem->IsRegenerating())
 		{
-			golem::ThreadPool::Task task = [=]
-			{
-				m_pointLightRenderSystem->RuntimeCreatePipeline
-				(
-				golem::Application::Get().GetRenderer().GetSwapChainRenderPass(),
-				{
-					"shaders/point_light_shader/point_light_shader.vert",
-					"shaders/point_light_shader/point_light_shader.frag"
-				});
-			};
-
-			Application::Get().GetThreadPool().Enqueue(task);
+			Application::Get().GetThreadPool().Enqueue([=]{m_pointLightRenderSystem->RuntimeCreatePipeline();});
 		}
 
 		ImGui::End();
@@ -238,8 +204,15 @@ public:
 
 	void OnEvent(golem::Event& e) override
 	{
-		//if(e.GetEventType() != golem::EventType::MouseMoved)
-		//	GOL_TRACE("{0}", e.ToString());
+		golem::EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<golem::ShaderReCompileEvent>(BIND_EVENT_FUNC(ExampleLayer::OnShaderRecompile));
+	}
+
+	bool OnShaderRecompile(golem::ShaderReCompileEvent& e)
+	{
+		e.GetRenderSystem()->CompleteRegeneration();
+
+		return true;
 	}
 };
 

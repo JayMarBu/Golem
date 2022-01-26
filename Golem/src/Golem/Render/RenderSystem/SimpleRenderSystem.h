@@ -16,15 +16,17 @@ namespace golem
 	public:
 		SimpleRenderSystem(
 			Device& _device,
-			VkRenderPass _renderPass,
-			VkDescriptorSetLayout descriptorSet,
-			const std::string& vert_filepath,
-			const std::string& frag_filepath
+			VkDescriptorSetLayout descriptorSet
 		);
-		virtual ~SimpleRenderSystem();
+		virtual ~SimpleRenderSystem(){}
 
 		REMOVE_COPY_CONSTRUCTOR(SimpleRenderSystem);
 
 		void RenderGameObjects(FrameInfo& fInfo, std::vector<TempGameObject>& gameObjects);
+
+		virtual void CreatePipelineLayout(
+			VkDescriptorSetLayout descriptorSet,
+			uint32_t pushConstantSize,
+			VkShaderStageFlags pushConstantShaderStages) override;
 	};
 }

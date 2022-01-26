@@ -9,17 +9,20 @@ namespace golem
 	{
 		// Members ********************************************************************************
 	protected:
+		// Rendering data
 		Device& m_device;
 
 		std::unique_ptr<Pipeline> m_pipeline;
 		VkPipelineLayout m_pipelineLayout;
 
+		ShaderPaths m_shaderPaths;
 		VkShaderStageFlags m_pushConstantShaderStages;
 		PipelineConfigInfo m_configInfo;
 
+		// Async recompile data
 		Pipeline* m_newPipeline = nullptr;
-		bool hasRegenerated = false;
-		bool isRegenerating = false;
+		bool m_hasRegenerated = false;
+		bool m_isRegenerating = false;
 
 		mutable std::mutex m_regenerationMutex;
 
@@ -30,21 +33,18 @@ namespace golem
 
 		REMOVE_COPY_CONSTRUCTOR(RenderSystemBase);
 
-		void RuntimeCreatePipeline(
-			VkRenderPass renderPass,
-			ShaderPaths shaderPaths
-		);
+		virtual void RuntimeCreatePipeline();
 
 		bool HasRegenerated() const 
 		{
 			std::unique_lock<std::mutex> lock{m_regenerationMutex};
-			return hasRegenerated;
+			return m_hasRegenerated;
 		}
 
 		bool IsRegenerating() const
 		{
 			std::unique_lock<std::mutex> lock{ m_regenerationMutex };
-			return isRegenerating;
+			return m_isRegenerating;
 		}
 
 		void CompleteRegeneration();
@@ -55,15 +55,31 @@ namespace golem
 		virtual void CreatePipelineLayout(
 			VkDescriptorSetLayout descriptorSet,
 			uint32_t pushConstantSize,
-			VkShaderStageFlags pushConstantShaderStages = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT
-		);
+			VkShaderStageFlags pushConstantShaderStages) = 0;
 
-		virtual void CreatePipeline(
-			VkRenderPass renderPass,
-			ShaderPaths shaderPaths,
-			PipelineConfigInfo& pipelineConfig,
-			const std::vector<VkVertexInputBindingDescription>& vertexBindingDesc = Vertex::GetBindingDescriptions(),
-			const std::vector<VkVertexInputAttributeDescription>& vertexAttribDesc = Vertex::GetAttributeDescriptions()
-		);
+		virtual void CreatePipeline();
+
+		void EndRecompilation(bool success);
+
+		void SetIsRegenerating(bool isRegenerating) 
+		{
+			std::unique_lock<std::mutex> lock{ m_regenerationMutex };
+			m_isRegenerating = isRegenerating;
+		}
+
+		void SetHasRegenerated(bool hasRegenerated)
+		{
+			std::unique_lock<std::mutex> lock{ m_regenerationMutex };
+			m_hasRegenerated = hasRegenerated;
+		}
+
+		void SetBothRegenerationFlags(bool isRegenerating,bool hasRegenerated)
+		{
+			std::unique_lock<std::mutex> lock{ m_regenerationMutex };
+			m_isRegenerating = isRegenerating;
+			m_hasRegenerated = hasRegenerated;
+		}
+
+		std::string SPVShaderPath(std::string& path);
 	};
 }
