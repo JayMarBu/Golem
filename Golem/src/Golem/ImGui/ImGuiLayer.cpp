@@ -41,7 +41,7 @@ namespace golem
 			.AddPoolSize(VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 )
 			.SetPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
 			.SetMaxSets(1000 * 11)
-			.build();
+			.Build();
 
 		// Setup Dear ImGui context
 		IMGUI_CHECKVERSION();

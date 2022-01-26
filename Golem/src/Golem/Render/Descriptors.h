@@ -69,7 +69,7 @@ namespace golem
 			Builder& AddPoolSize(VkDescriptorType descriptorType, uint32_t count);
 			Builder& SetPoolFlags(VkDescriptorPoolCreateFlags flags);
 			Builder& SetMaxSets(uint32_t count);
-			std::unique_ptr<DescriptorPool> build() const;
+			std::unique_ptr<DescriptorPool> Build() const;
 		};
 
 	private:

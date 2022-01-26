@@ -27,6 +27,7 @@ namespace golem
 		float frameTime;
 		VkCommandBuffer commandBuffer;
 		Camera& camera;
+		glm::vec3 camPos;
 		VkDescriptorSet globalDescriptorSet;
 	};
 }

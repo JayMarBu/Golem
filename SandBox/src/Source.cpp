@@ -5,6 +5,8 @@
 
 #include "Golem/Render/RenderSystem/SimpleRenderSystem.h"
 #include "Golem/Render/RenderSystem/PointLightRenderSystem.h"
+#include "Golem/Render/RenderSystem/InfiniGridRenderSystem.h"
+
 #include "Golem/Events/RenderSystemEvents.h"
 
 using golem::Application;
@@ -29,6 +31,7 @@ private:
 
 	std::unique_ptr<golem::SimpleRenderSystem> m_simpleRenderSystem;
 	std::unique_ptr<golem::PointLightRenderSystem> m_pointLightRenderSystem;
+	std::unique_ptr<golem::InfiniGridRenderSystem> m_infinigridRenderSystem;
 
 	std::vector<golem::TempGameObject> m_gameObjects;
 	CameraWrapper m_camera{};
@@ -112,7 +115,7 @@ public:
 			.SetMaxSets(golem::SwapChain::MAX_FRAMES_IN_FLIGHT)
 			.AddPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, golem::SwapChain::MAX_FRAMES_IN_FLIGHT)
 			.AddPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, golem::SwapChain::MAX_FRAMES_IN_FLIGHT)
-			.build();
+			.Build();
 
 		m_globalSetLayout = golem::DescriptorSetLayout::Builder(device)
 			.AddBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
@@ -140,8 +143,7 @@ public:
 			device,
 			m_globalSetLayout->GetDescriptorSetLayout());
 
-		GOL_TRACE("{0}", sizeof(golem::Pipeline));
-		GOL_TRACE("{0}", sizeof(golem::Device&));
+		m_infinigridRenderSystem = std::make_unique<golem::InfiniGridRenderSystem>(device);
 	}
 
 	void OnPostRender() override
@@ -166,6 +168,7 @@ public:
 			m_timer.getTime(),
 			commandBuffer,
 			m_camera.camera,
+			m_camera.gObject.transform.translation,
 			m_globalDescriptorSets[golem::Application::Get().GetRenderer().GetFrameIndex()]
 		};
 
@@ -183,6 +186,7 @@ public:
 		// ------ render scene ------
 		m_simpleRenderSystem->RenderGameObjects(fInfo, m_gameObjects);
 		m_pointLightRenderSystem->Render(fInfo, m_gameObjects);
+		m_infinigridRenderSystem->Render(fInfo);
 	}
 
 	void OnImGuiRender() override
@@ -198,6 +202,13 @@ public:
 		{
 			Application::Get().GetThreadPool().Enqueue([=]{m_pointLightRenderSystem->RuntimeCreatePipeline();});
 		}
+
+		if (ImGui::Button("Recompile InfiniGrid Shader") && !m_infinigridRenderSystem->IsRegenerating())
+		{
+			Application::Get().GetThreadPool().Enqueue([=] {m_infinigridRenderSystem->RuntimeCreatePipeline(); });
+		}
+
+		ImGui::Checkbox("Render Grid", &m_infinigridRenderSystem->render);
 
 		ImGui::End();
 	}

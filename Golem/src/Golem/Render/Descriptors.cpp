@@ -74,7 +74,7 @@ namespace golem
 		return *this;
 	}
 
-	std::unique_ptr<DescriptorPool> DescriptorPool::Builder::build() const
+	std::unique_ptr<DescriptorPool> DescriptorPool::Builder::Build() const
 	{
 		return std::make_unique<DescriptorPool>(m_device, m_maxSets, m_poolFlags, m_poolSizes);
 	}
