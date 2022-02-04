@@ -158,10 +158,10 @@ namespace golem
 				};
 
 				*vertices = {
-				{pos[TL],	COLOUR_WHITE, NORMAL(0,-1,0),	uv[TL]}, // 0
-				{pos[TR],	COLOUR_WHITE, NORMAL(0,-1,0),	uv[TR]}, // 1
-				{pos[BL],	COLOUR_WHITE, NORMAL(0,-1,0),	uv[BL]}, // 2
-				{pos[BR],	COLOUR_WHITE, NORMAL(0,-1,0),	uv[BR]}  // 3
+				{pos[TL],	COLOUR_WHITE, NORMAL(0,-1,0),	uv[TL]},
+				{pos[TR],	COLOUR_WHITE, NORMAL(0,-1,0),	uv[TR]},
+				{pos[BL],	COLOUR_WHITE, NORMAL(0,-1,0),	uv[BL]},
+				{pos[BR],	COLOUR_WHITE, NORMAL(0,-1,0),	uv[BR]}
 				};
 
 				*indices = {

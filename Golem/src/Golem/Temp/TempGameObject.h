@@ -1,30 +1,9 @@
 #pragma once
 #include "../Render/Objects/Model.h"
+#include "../Components/Transform.h"
 
 namespace golem
 {
-	struct CTransform
-	{
-	public:
-		CTransform* parent;
-
-		glm::vec3 translation{ 0.f,0.f,0.f };
-		glm::vec3 rotation{ 0.f,0.f,0.f };
-		glm::vec3 scale{ 1.f,1.f,1.f };
-
-		glm::mat4 mat4();
-
-		glm::mat3 invRotationMat();
-
-		glm::mat3 normalMatrix();
-
-		glm::mat4 positionRotMat();
-
-		glm::mat4 scaleMat();
-
-		operator glm::mat4() { return mat4(); }
-	};
-
 	struct CPointLight
 	{
 		float lightIntensity = 1.0f;
@@ -40,7 +19,7 @@ namespace golem
 		glm::vec3 colour{};
 
 		std::unique_ptr<CPointLight> pointLight = nullptr;
-		CTransform transform{};
+		Transform transform{};
 
 	private:
 

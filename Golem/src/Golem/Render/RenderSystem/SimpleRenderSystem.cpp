@@ -41,13 +41,22 @@ namespace golem
 			if(obj.model == nullptr)
 				continue;
 			
-			//obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + (1.f * fInfo.frameTime), glm::two_pi<float>());
-			//obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + (0.1f * fInfo.frameTime), glm::two_pi<float>());
+			/*auto rot = obj.transform.GetRot();
+
+			obj.transform2.Rotation(
+				glm::mod(glm::radians(rot.x) + (1.0f * fInfo.frameTime), glm::two_pi<float>()),
+				glm::mod(glm::radians(rot.y) + (1.f * fInfo.frameTime), glm::two_pi<float>()),
+				0,
+				false
+			);*/
 
 			SimplePushConstantData pushData{};
 
-			pushData.modelMatrix = obj.transform.positionRotMat() * obj.transform.scaleMat();
-			pushData.normalMatrix = obj.transform.normalMatrix();
+			//pushData.modelMatrix = obj.transform.positionRotMat() * obj.transform.scaleMat();
+			//pushData.normalMatrix = obj.transform.normalMatrix();
+			
+			pushData.modelMatrix = obj.transform;
+			pushData.normalMatrix = obj.transform.NormalMatrix();
 
 			vkCmdPushConstants(
 				fInfo.commandBuffer,

@@ -44,12 +44,16 @@ namespace golem
 		}
 
 		if (VecIsZero(rotate))
-			gameObject.transform.rotation += turnSpeed * dt * glm::normalize(rotate);
+		{
+			glm::vec3 rot = gameObject.transform.EulerAngles() + turnSpeed * dt * glm::normalize(rotate);
+			gameObject.transform.Rotation(rot);
+		}
+			
+		
+		gameObject.transform.RotationX(glm::clamp(gameObject.transform.EulerAngles().x, -1.5f, 1.5f));
+		gameObject.transform.RotationY(glm::mod(gameObject.transform.EulerAngles().y, glm::two_pi<float>()));
 
-		gameObject.transform.rotation.x = glm::clamp(gameObject.transform.rotation.x, -1.5f, 1.5f);
-		gameObject.transform.rotation.y = glm::mod(gameObject.transform.rotation.y, glm::two_pi<float>());
-
-		float yaw = gameObject.transform.rotation.y;
+		float yaw = gameObject.transform.EulerAngles().y;
 		const glm::vec3 forwardDir{ sin(yaw), 0.0f, cos(yaw) };
 		const glm::vec3 rightDir{ forwardDir.z, 0.0f, -forwardDir.x };
 		const glm::vec3 upDir{ 0.0f, -1.0f, 0.0f };
@@ -132,7 +136,7 @@ namespace golem
 			{
 				if (two_D == true)
 				{
-					gameObject.transform.rotation = { 0,0,0 };
+					gameObject.transform.Rotation( 0,0,0 );
 				}
 			}
 			ImGui::Text(("Position: (" + std::to_string(gameObject.transform.translation.x) + ", " + std::to_string(gameObject.transform.translation.y) + ", " + std::to_string(gameObject.transform.translation.z) + ")").c_str());

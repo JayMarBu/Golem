@@ -57,6 +57,7 @@ public:
 		cube.transform.translation = { 1.5f,0.f,0 };
 		m_gameObjects.push_back(std::move(cube));
 
+
 		std::shared_ptr<golem::Model> quadModel = golem::Model::CreateModelFromPrimative(device, golem::Primitives::Quad);
 		auto quad = golem::TempGameObject::Create();
 		quad.model = quadModel;
@@ -157,7 +158,7 @@ public:
 
 		// ------ update camera ------
 		m_camera.controller.MoveInPlaneXZ(m_timer.getTime(), m_camera.gObject);
-		m_camera.camera.SetViewXYZ(m_camera.gObject.transform.translation, m_camera.gObject.transform.rotation);
+		m_camera.camera.SetViewXYZ(m_camera.gObject.transform.translation, m_camera.gObject.transform.EulerAngles());
 
 		float aspect = golem::Application::Get().GetRenderer().GetAspectRatio();
 		m_camera.camera.SetPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 100.0f);
