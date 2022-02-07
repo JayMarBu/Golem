@@ -10,6 +10,7 @@
 #include "Golem/Events/RenderSystemEvents.h"
 
 using golem::Application;
+using golem::Ref;
 
 struct CameraWrapper
 {
@@ -23,20 +24,20 @@ struct CameraWrapper
 class ExampleLayer : public golem::Layer
 {
 private:
-	std::unique_ptr<golem::DescriptorPool> m_globalPool;
-	std::unique_ptr<golem::DescriptorSetLayout> m_globalSetLayout;
+	golem::Scope<golem::DescriptorPool> m_globalPool;
+	golem::Scope<golem::DescriptorSetLayout> m_globalSetLayout;
 	std::vector<VkDescriptorSet> m_globalDescriptorSets;
 
-	std::vector<std::unique_ptr<golem::Buffer>> m_UBObuffers;
+	std::vector<golem::Scope<golem::Buffer>> m_UBObuffers;
 
-	std::unique_ptr<golem::SimpleRenderSystem> m_simpleRenderSystem;
-	std::unique_ptr<golem::PointLightRenderSystem> m_pointLightRenderSystem;
-	std::unique_ptr<golem::InfiniGridRenderSystem> m_infinigridRenderSystem;
+	golem::Scope<golem::SimpleRenderSystem> m_simpleRenderSystem;
+	golem::Scope<golem::PointLightRenderSystem> m_pointLightRenderSystem;
+	golem::Scope<golem::InfiniGridRenderSystem> m_infinigridRenderSystem;
 
 	std::vector<golem::TempGameObject> m_gameObjects;
 	CameraWrapper m_camera{};
 
-	std::unique_ptr<golem::Sampler> m_sampler;
+	golem::Scope<golem::Sampler> m_sampler;
 
 	golem::FrameTimer m_timer;
 
@@ -51,21 +52,21 @@ public:
 
 		auto& device = golem::Application::Get().GetDevice();
 
-		std::shared_ptr<golem::Model> cubeModel = golem::Model::CreateModelFromPrimative(device, golem::Primitives::Cube, false);
+		Ref<golem::Model> cubeModel = golem::Model::CreateModelFromPrimative(device, golem::Primitives::Cube, false);
 		auto cube = golem::TempGameObject::Create();
 		cube.model = cubeModel;
 		cube.transform.translation = { 1.5f,0.f,0 };
 		m_gameObjects.push_back(std::move(cube));
 
 
-		std::shared_ptr<golem::Model> quadModel = golem::Model::CreateModelFromPrimative(device, golem::Primitives::Quad);
+		Ref<golem::Model> quadModel = golem::Model::CreateModelFromPrimative(device, golem::Primitives::Quad);
 		auto quad = golem::TempGameObject::Create();
 		quad.model = quadModel;
 		quad.transform.translation = { 0,0.75f,0 };
 		quad.transform.scale = { 7,1,7 };
 		m_gameObjects.push_back(std::move(quad));
 
-		std::shared_ptr<golem::Model> vaseModel = golem::Model::CreateModelFromFile(device, "models/smooth_vase.obj");
+		Ref<golem::Model> vaseModel = golem::Model::CreateModelFromFile(device, "models/smooth_vase.obj");
 		auto vase = golem::TempGameObject::Create();
 		vase.model = vaseModel;
 		vase.transform.translation = { -1.5f,0.5f,0 };

@@ -16,13 +16,13 @@ namespace golem
 	{
 		// Members ********************************************************************************
 	protected:
-		std::unique_ptr<Window> m_window;
-		std::unique_ptr<Device> m_device;
-		std::unique_ptr<golem::Renderer> m_renderer;
+		Scope<Window> m_window;
+		Scope<Device> m_device;
+		Scope<golem::Renderer> m_renderer;
 		ThreadPool m_threadPool{8};
 
 		// Temp stuff ---------------------------------------------------------
-		std::unique_ptr<TextureManager> m_textureManager;
+		Scope<TextureManager> m_textureManager;
 		// --------------------------------------------------------------------
 
 		ImGuiLayer* m_guiLayer;

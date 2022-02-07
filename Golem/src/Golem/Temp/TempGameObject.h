@@ -15,10 +15,10 @@ namespace golem
 	public:
 		using id_t = unsigned int;
 
-		std::shared_ptr<Model> model = nullptr;
+		Ref<Model> model = nullptr;
 		glm::vec3 colour{};
 
-		std::unique_ptr<CPointLight> pointLight = nullptr;
+		Ref<CPointLight> pointLight = nullptr;
 		Transform transform{};
 
 	private:

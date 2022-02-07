@@ -24,3 +24,14 @@
 
 #define  MAP_CONTAINS(_map_,_val_) (_map_.find(_val_) != _map_.end())
 #define  LOOP_MAP_ITEMS(_map_, _it_) auto _it_ = _map_.begin(); _it_ != _map_.end(); _it_++
+
+
+#include <memory>
+namespace golem
+{
+	template <typename T>
+	using Scope = std::unique_ptr<T>;
+
+	template <typename T>
+	using Ref = std::shared_ptr<T>;
+}
