@@ -13,7 +13,15 @@ namespace golem
 		bool runtimeCompile)
 		: m_device(device)
 	{
-		CreateGraphicsPipeline(
+		if(!runtimeCompile)
+		{
+			CreateGraphicsPipeline(
+				shaderPaths.vert_filepath,
+				shaderPaths.frag_filepath,
+				configInfo);
+			return;
+		}
+		CreateGraphicsPipelineNoVerts(
 			shaderPaths.vert_filepath,
 			shaderPaths.frag_filepath,
 			configInfo);
@@ -155,6 +163,20 @@ namespace golem
 		BuildPipeline(configInfo);
 	}
 
+	void Pipeline::CreateGraphicsPipelineNoVerts(const std::string& vert_filepath, const std::string& frag_filepath, const PipelineConfigInfo& configInfo)
+	{
+		GOL_CORE_ASSERT(configInfo.pipelineLayout != VK_NULL_HANDLE, "cannot create graphics pipeline:: no pipelineLayout provided in configInfo");
+		GOL_CORE_ASSERT(configInfo.renderPass != VK_NULL_HANDLE, "cannot create graphics pipeline:: no renderPass provided in configInfo");
+
+		auto vertCode = ReadFile(vert_filepath);
+		auto fragCode = ReadFile(frag_filepath);
+
+		CreateShaderModule(vertCode, &m_vertShaderModule);
+		CreateShaderModule(fragCode, &m_fragShaderModule);
+
+		BuildPipelineNoVerts(configInfo);
+	}
+
 	void Pipeline::ReCreateGraphicsPipeline(
 		std::vector<uint32_t>&& vertShaderCode,
 		std::vector<uint32_t>&& fragShaderCode,
@@ -246,6 +268,84 @@ namespace golem
 		else
 		{
 			
+			auto result = vkCreateGraphicsPipelines(m_device.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_graphicsPipeline);
+			if (result != VK_SUCCESS)
+			{
+				GOL_CORE_ERROR("failed to create graphics pipeline!");
+				*success = false;
+				return;
+			}
+			*success = true;
+		}
+	}
+
+	void Pipeline::BuildPipelineNoVerts(const PipelineConfigInfo& configInfo, bool* success /*= nullptr*/)
+	{
+		// create array storing all pipeline stages
+		VkPipelineShaderStageCreateInfo shaderStages[2];
+
+		// assign shader pipeline stage to ShaderStage struct
+		shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+		shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+
+		// assign the shader module to the pipeline stage
+		shaderStages[0].module = m_vertShaderModule;
+		shaderStages[0].pName = "main";
+
+		shaderStages[0].flags = 0;
+		shaderStages[0].pNext = nullptr;
+		shaderStages[0].pSpecializationInfo = nullptr;
+
+		// repeat for the fragment shader
+		shaderStages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+		shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+		shaderStages[1].module = m_fragShaderModule;
+		shaderStages[1].pName = "main";
+		shaderStages[1].flags = 0;
+		shaderStages[1].pNext = nullptr;
+		shaderStages[1].pSpecializationInfo = nullptr;
+
+		// create struct to describe the format of 
+		// vertex data being sent to the GPU
+		VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+
+		//auto bindingDescription = Model::Vertex::getBindingDescriptions();
+		//auto attributeDescriptions = Model::Vertex::getAttributeDescriptions();
+		vertexInputInfo.vertexBindingDescriptionCount = 0;
+		vertexInputInfo.pVertexBindingDescriptions = nullptr;
+		vertexInputInfo.vertexAttributeDescriptionCount = 0;
+		vertexInputInfo.pVertexAttributeDescriptions = nullptr;
+
+		// create pipeline info struct
+		VkGraphicsPipelineCreateInfo pipelineInfo{};
+		pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+		pipelineInfo.stageCount = 2;
+		pipelineInfo.pStages = shaderStages;
+		// reference all pipeline create structs created above
+		pipelineInfo.pVertexInputState = &vertexInputInfo;
+		pipelineInfo.pInputAssemblyState = &configInfo.inputAssemblyInfo;
+		pipelineInfo.pViewportState = &configInfo.viewportInfo;
+		pipelineInfo.pRasterizationState = &configInfo.rasterizationInfo;
+		pipelineInfo.pMultisampleState = &configInfo.multisampleInfo;
+		pipelineInfo.pDepthStencilState = &configInfo.depthStencilInfo;
+		pipelineInfo.pColorBlendState = &configInfo.colorBlendInfo;
+		pipelineInfo.pDynamicState = &configInfo.dynamicStateInfo;
+		// attach handle to pipeline layout
+		pipelineInfo.layout = configInfo.pipelineLayout;
+		// attach render pass
+		pipelineInfo.renderPass = configInfo.renderPass;
+		pipelineInfo.subpass = configInfo.subpass;
+
+		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
+		pipelineInfo.basePipelineIndex = -1; // Optional
+
+		// create graphics pipeline
+		if (success == nullptr)
+			SAFE_RUN_VULKAN_FUNC(vkCreateGraphicsPipelines(m_device.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_graphicsPipeline), "failed to create graphics pipeline!")
+		else
+		{
+
 			auto result = vkCreateGraphicsPipelines(m_device.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_graphicsPipeline);
 			if (result != VK_SUCCESS)
 			{

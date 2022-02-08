@@ -49,6 +49,8 @@ namespace golem
 
 		void CompleteRegeneration();
 
+		static std::string SPVShaderPath(std::string& path);
+
 	protected:
 		RenderSystemBase(Device& device) : m_device(device) {}
 
@@ -80,6 +82,6 @@ namespace golem
 			m_hasRegenerated = hasRegenerated;
 		}
 
-		std::string SPVShaderPath(std::string& path);
+		
 	};
 }

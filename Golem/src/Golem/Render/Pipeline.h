@@ -145,7 +145,17 @@ namespace golem
 			const PipelineConfigInfo& configInfo,
 			bool* success = nullptr);
 
+		void BuildPipelineNoVerts(
+			const PipelineConfigInfo& configInfo,
+			bool* success = nullptr);
+
 		void CreateGraphicsPipeline(
+			const std::string& vert_filepath,
+			const std::string& frag_filepath,
+			const PipelineConfigInfo& configInfo
+		);
+
+		void CreateGraphicsPipelineNoVerts(
 			const std::string& vert_filepath,
 			const std::string& frag_filepath,
 			const PipelineConfigInfo& configInfo

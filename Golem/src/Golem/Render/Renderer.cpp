@@ -19,7 +19,7 @@ namespace golem
 
 	VkCommandBuffer Renderer::BeginFrame()
 	{
-		assert(!m_isFrameStarted && "Another frame is already in progress, EndFrame() has not yet been called for the previous frame");
+		GOL_CORE_ASSERT(!m_isFrameStarted, "Another frame is already in progress, EndFrame() has not yet been called for the previous frame");
 
 		auto result = m_swapChain->AcquireNextImage(&m_currentImageIndex);
 		if (result == VK_ERROR_OUT_OF_DATE_KHR)
@@ -146,14 +146,11 @@ namespace golem
 			std::shared_ptr<SwapChain> oldSwapChain = std::move(m_swapChain);
 
 			m_swapChain = std::make_unique<SwapChain>(m_device, extent, oldSwapChain);
-
-			if (!oldSwapChain->IsSwapChainFormatCompatible(*m_swapChain.get()))
-			{
-				throw std::runtime_error("Swap chain image format has changed");
-			}
+			
+			GOL_CORE_ASSERT(oldSwapChain->IsSwapChainFormatCompatible(*m_swapChain.get()), "Swap chain image format has changed");
 		}
 
-		// TODO: should really check if the pipeline needs re-created
+		// TODO: should really check if the pipelines needs re-created
 	}
 
 }

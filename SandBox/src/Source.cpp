@@ -9,6 +9,8 @@
 
 #include "Golem/Events/RenderSystemEvents.h"
 
+#include "Golem/EntryPoint.h"
+
 using golem::Application;
 using golem::Ref;
 
@@ -165,7 +167,8 @@ public:
 		m_camera.camera.SetPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 100.0f);
 
 		// ------ fill frame info struct ------
-		golem::FrameInfo fInfo{
+		golem::FrameInfo fInfo
+		{
 			golem::Application::Get().GetRenderer().GetFrameIndex(),
 			m_timer.getTime(),
 			commandBuffer,

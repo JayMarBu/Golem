@@ -36,11 +36,11 @@ namespace golem
 		void BeginSwapChainRenderPass(VkCommandBuffer commandBuffer);
 		void EndSwapChainRenderPass(VkCommandBuffer commandBuffer);
 
+		inline SwapChain& GetSwapChain() const {return *m_swapChain;}
 		inline VkRenderPass GetSwapChainRenderPass() const { return m_swapChain->renderPass(); }
 		inline float GetAspectRatio() const { return m_swapChain->extentAspectRatio(); }
 		inline bool IsFrameInProgress() const { return m_isFrameStarted; }
 		inline uint32_t GetImageCount() const { return (uint32_t)m_swapChain->imageCount(); }
-
 
 		inline int GetFrameIndex() const
 		{

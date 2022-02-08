@@ -10,6 +10,13 @@
 #include "Temp/TextureManager.h"
 #include "ThreadPool.h"
 
+// Temp -----------------------------------------
+#include "Temp/TempGameObject.h"
+#include "Render/RenderSystem/SimpleRenderSystem.h"
+#include "Render/Objects/Sampler.h"
+
+// ----------------------------------------------
+
 namespace golem
 {
 	class Application
@@ -23,6 +30,46 @@ namespace golem
 
 		// Temp stuff ---------------------------------------------------------
 		Scope<TextureManager> m_textureManager;
+
+		struct FrameBufferAttachment 
+		{
+			VkImage image;
+			VkDeviceMemory mem;
+			VkImageView view;
+		};
+
+		struct OffscreenPass 
+		{
+			int32_t width, height;
+			VkFramebuffer frameBuffer;
+			FrameBufferAttachment depth;
+			FrameBufferAttachment colour;
+			VkRenderPass renderPass;
+			VkSampler depthSampler;
+			VkDescriptorImageInfo descriptor;
+			VkFormat colourFormat;
+			VkFormat depthFormat;
+		} offscreenPass;
+
+		
+		std::vector<TempGameObject> temp_gameobjects;
+
+		golem::Scope<golem::DescriptorPool> m_globalPool;
+		golem::Scope<golem::DescriptorSetLayout> m_globalSetLayout;
+		std::vector<VkDescriptorSet> m_globalDescriptorSets;
+
+		std::vector<golem::Scope<golem::Buffer>> m_UBObuffers;
+
+		golem::Scope<golem::SimpleRenderSystem> m_simpleRenderSystem;
+
+		golem::Camera camera{};
+		TempGameObject m_camGobj;
+
+		golem::Scope<golem::Sampler> m_sampler;
+
+		Scope<Pipeline> testPipeline; 
+		VkPipelineLayout m_pipelineLayout;
+
 		// --------------------------------------------------------------------
 
 		ImGuiLayer* m_guiLayer;
@@ -54,6 +101,10 @@ namespace golem
 		void PushOverlay(Layer* layer);
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
+
+		void prepareOffscreenRenderpass();
+		void prepareOffscreenFramebuffer();
+		void buildPipeline();
 	};
 
 	// To be defined in client

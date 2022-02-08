@@ -25,4 +25,4 @@
 #include "Golem/Render/RenderSystem/RenderSystemBase.h"
 
 // Entry Point ************************************************************************************
-#include "Golem/EntryPoint.h"
+//#include "Golem/EntryPoint.h"
