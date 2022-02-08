@@ -14,6 +14,7 @@
 #include "Temp/TempGameObject.h"
 #include "Render/RenderSystem/SimpleRenderSystem.h"
 #include "Render/Objects/Sampler.h"
+#include "Render/RenderTexture.h"
 
 // ----------------------------------------------
 
@@ -40,18 +41,19 @@ namespace golem
 
 		struct OffscreenPass 
 		{
-			int32_t width, height;
-			VkFramebuffer frameBuffer;
-			FrameBufferAttachment depth;
-			FrameBufferAttachment colour;
+			//int32_t width, height;
+			//VkFramebuffer frameBuffer;
+			//FrameBufferAttachment depth;
+			//FrameBufferAttachment colour;
 			VkRenderPass renderPass;
-			VkSampler depthSampler;
-			VkDescriptorImageInfo descriptor;
-			VkFormat colourFormat;
-			VkFormat depthFormat;
+			//VkSampler depthSampler;
+			//VkDescriptorImageInfo descriptor;
+			//VkFormat colourFormat;
+			//VkFormat depthFormat;
+
+			Scope<RenderTexture> renderTexture; 
 		} offscreenPass;
 
-		
 		std::vector<TempGameObject> temp_gameobjects;
 
 		golem::Scope<golem::DescriptorPool> m_globalPool;
@@ -101,6 +103,7 @@ namespace golem
 		void PushOverlay(Layer* layer);
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
+		bool OnWindowResize(WindowResizeEvent& e);
 
 		void prepareOffscreenRenderpass();
 		void prepareOffscreenFramebuffer();

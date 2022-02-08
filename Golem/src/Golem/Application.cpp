@@ -5,6 +5,8 @@
 #include "Render/FrameInfo.h"
 #include "Input/Input.h"
 
+#include "backends/imgui_impl_vulkan.h"
+
 namespace golem
 {
 	golem::Application* Application::s_instance = nullptr;
@@ -74,11 +76,9 @@ namespace golem
 		m_globalDescriptorSets.resize(golem::SwapChain::MAX_FRAMES_IN_FLIGHT);
 		for (int i = 0; i < m_globalDescriptorSets.size(); i++)
 		{
-			auto bufferInfo = m_UBObuffers[i]->DescriptorInfo();
-
 			VkDescriptorImageInfo descriptorImageInfo{};
-			descriptorImageInfo.sampler = offscreenPass.depthSampler;
-			descriptorImageInfo.imageView = offscreenPass.colour.view;
+			descriptorImageInfo.sampler = offscreenPass.renderTexture->GetSampler()->getSampler();
+			descriptorImageInfo.imageView = offscreenPass.renderTexture->GetColourAttachment()->view;
 			descriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 			golem::DescriptorWriter(*m_globalSetLayout, *m_globalPool)
@@ -87,32 +87,12 @@ namespace golem
 		}
 
 		buildPipeline();
-
-		// init render systems
-		/*m_simpleRenderSystem = std::make_unique<golem::SimpleRenderSystem>(
-			device,
-			m_globalSetLayout->GetDescriptorSetLayout());*/
-
 		// Temp stuff ---------------------------------------------------------
 	}
 
 	Application::~Application()
 	{
 		vkDestroyPipelineLayout(*m_device, m_pipelineLayout, nullptr);
-
-		vkDestroySampler(*m_device, offscreenPass.depthSampler, nullptr);
-
-		// colour attachment
-		vkDestroyImageView(*m_device, offscreenPass.colour.view, nullptr);
-		vkDestroyImage(*m_device, offscreenPass.colour.image, nullptr);
-		vkFreeMemory(*m_device, offscreenPass.colour.mem, nullptr);
-
-		// Depth attachment
-		vkDestroyImageView(*m_device, offscreenPass.depth.view, nullptr);
-		vkDestroyImage(*m_device, offscreenPass.depth.image, nullptr);
-		vkFreeMemory(*m_device, offscreenPass.depth.mem, nullptr);
-
-		vkDestroyFramebuffer(*m_device, offscreenPass.frameBuffer, nullptr);
 
 		vkDestroyRenderPass(*m_device, offscreenPass.renderPass, nullptr);
 	}
@@ -130,7 +110,7 @@ namespace golem
 
 			// Temp -----------------------------
 			
-			VkClearColorValue defaultClearColor = { { 0.025f, 0.025f, 0.025f, 1.0f } };
+			VkClearColorValue defaultClearColor = { { 0.01f, 0.01f, 0.01f, 1.0f } };
 			VkClearValue clearValues[2];
 			VkViewport viewport{};
 			VkRect2D scissor{};
@@ -141,33 +121,25 @@ namespace golem
 			VkRenderPassBeginInfo renderPassBeginInfo{};
 			renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 			renderPassBeginInfo.renderPass = offscreenPass.renderPass;
-			renderPassBeginInfo.framebuffer = offscreenPass.frameBuffer;
-			renderPassBeginInfo.renderArea.extent.width = offscreenPass.width;
-			renderPassBeginInfo.renderArea.extent.height = offscreenPass.height;
+			renderPassBeginInfo.framebuffer = offscreenPass.renderTexture->GetFrameBuffer();
+			renderPassBeginInfo.renderArea.extent.width = offscreenPass.renderTexture->GetWidth();
+			renderPassBeginInfo.renderArea.extent.height = offscreenPass.renderTexture->GetHeight();
 			renderPassBeginInfo.clearValueCount = 2;
 			renderPassBeginInfo.pClearValues = clearValues;
 			
 			vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			viewport.width = (float)offscreenPass.width;
-			viewport.height = (float)offscreenPass.height;
+			viewport.width = (float)offscreenPass.renderTexture->GetWidth();
+			viewport.height = (float)offscreenPass.renderTexture->GetHeight();
 			viewport.minDepth = 0;
 			viewport.maxDepth = 1;
 			vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 
-			scissor.extent.width = offscreenPass.width;
-			scissor.extent.height = offscreenPass.height;
+			scissor.extent.width = offscreenPass.renderTexture->GetWidth();
+			scissor.extent.height = offscreenPass.renderTexture->GetHeight();
 			scissor.offset.x = 0;
 			scissor.offset.y = 0;
 			vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
-
-			// Set depth bias (aka "Polygon offset")
-			// Required to avoid shadow mapping artifacts
-			vkCmdSetDepthBias(
-				commandBuffer,
-				1.25f,
-				0.0f,
-				1.75f);
 
 			for (auto layer : m_layerStack)
 				layer->OnRender(commandBuffer);
@@ -194,8 +166,8 @@ namespace golem
 			vkCmdDraw(commandBuffer, 6, 1, 0, 0);
 			// ----------------------------------
 
-			for(auto layer : m_layerStack)
-				layer->OnRender(commandBuffer);
+			//for(auto layer : m_layerStack)
+			//	layer->OnRender(commandBuffer);
 
 			m_guiLayer->Begin();
 			for (auto layer : m_layerStack)
@@ -217,8 +189,11 @@ namespace golem
 
 	void Application::prepareOffscreenRenderpass()
 	{
+		auto colourFormat = m_renderer->GetSwapChain().imageFormat();
+		auto depthFormat = m_renderer->GetSwapChain().FindDepthFormat();
+
 		VkAttachmentDescription attachmentDescription{};
-		attachmentDescription.format = offscreenPass.depthFormat;
+		attachmentDescription.format = depthFormat;
 		attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
 		attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;							// Clear depth at beginning of the render pass
 		attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;						// We will read from depth, so it's important to store the depth attachment results
@@ -232,7 +207,7 @@ namespace golem
 		depthReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;			// Attachment will be used as depth/stencil during render pass
 
 		VkAttachmentDescription colorAttachment = {};
-		colorAttachment.format = offscreenPass.colourFormat;
+		colorAttachment.format = colourFormat;
 		colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 		colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 		colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -284,128 +259,12 @@ namespace golem
 
 	void Application::prepareOffscreenFramebuffer()
 	{
-		offscreenPass.colourFormat = m_renderer->GetSwapChain().imageFormat();
-		offscreenPass.depthFormat = m_renderer->GetSwapChain().FindDepthFormat();
-
-		offscreenPass.width = 2048;
-		offscreenPass.height = 2048;
-
-		// Depth **********************************************************************************
-		VkImageCreateInfo depthImage{};
-		depthImage.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		depthImage.imageType = VK_IMAGE_TYPE_2D;
-		depthImage.extent.width = offscreenPass.width;
-		depthImage.extent.height = offscreenPass.height;
-		depthImage.extent.depth = 1;
-		depthImage.mipLevels = 1;
-		depthImage.arrayLayers = 1;
-		depthImage.samples = VK_SAMPLE_COUNT_1_BIT;
-		depthImage.tiling = VK_IMAGE_TILING_OPTIMAL;
-		depthImage.format = offscreenPass.depthFormat;																// Depth stencil attachment
-		depthImage.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;		// We will sample directly from the depth attachment for the shadow mapping
-		SAFE_RUN_VULKAN_FUNC(vkCreateImage(*m_device, &depthImage, nullptr, &offscreenPass.depth.image), "");
-
-		VkMemoryAllocateInfo depthMemAlloc{};
-		depthMemAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		VkMemoryRequirements depthMemReqs;
-		vkGetImageMemoryRequirements(*m_device, offscreenPass.depth.image, &depthMemReqs);
-		depthMemAlloc.allocationSize = depthMemReqs.size;
-		depthMemAlloc.memoryTypeIndex = m_device->FindMemoryType(depthMemReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		SAFE_RUN_VULKAN_FUNC(vkAllocateMemory(*m_device, &depthMemAlloc, nullptr, &offscreenPass.depth.mem), "");
-		SAFE_RUN_VULKAN_FUNC(vkBindImageMemory(*m_device, offscreenPass.depth.image, offscreenPass.depth.mem, 0), "");
-
-		VkImageViewCreateInfo depthStencilView{};
-		depthStencilView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		depthStencilView.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		depthStencilView.format = offscreenPass.depthFormat;
-		depthStencilView.subresourceRange = {};
-		depthStencilView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
-		depthStencilView.subresourceRange.baseMipLevel = 0;
-		depthStencilView.subresourceRange.levelCount = 1;
-		depthStencilView.subresourceRange.baseArrayLayer = 0;
-		depthStencilView.subresourceRange.layerCount = 1;
-		depthStencilView.image = offscreenPass.depth.image;
-		SAFE_RUN_VULKAN_FUNC(vkCreateImageView(*m_device, &depthStencilView, nullptr, &offscreenPass.depth.view), "");
-
-		// Colour *********************************************************************************
-		VkImageCreateInfo colourImage{};
-		colourImage.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		colourImage.imageType = VK_IMAGE_TYPE_2D;
-		colourImage.extent.width = offscreenPass.width;
-		colourImage.extent.height = offscreenPass.height;
-		colourImage.extent.depth = 1;
-		colourImage.mipLevels = 1;
-		colourImage.arrayLayers = 1;
-		colourImage.samples = VK_SAMPLE_COUNT_1_BIT;
-		colourImage.tiling = VK_IMAGE_TILING_OPTIMAL;
-		colourImage.format = offscreenPass.colourFormat;																// Depth stencil attachment
-		colourImage.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;		// We will sample directly from the depth attachment for the shadow mapping
-		SAFE_RUN_VULKAN_FUNC(vkCreateImage(*m_device, &colourImage, nullptr, &offscreenPass.colour.image),"");
-
-		VkMemoryAllocateInfo colourMemAlloc{};
-		colourMemAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		VkMemoryRequirements colourMemReqs;
-		vkGetImageMemoryRequirements(*m_device, offscreenPass.colour.image, &colourMemReqs);
-		colourMemAlloc.allocationSize = colourMemReqs.size;
-		colourMemAlloc.memoryTypeIndex = m_device->FindMemoryType(colourMemReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		SAFE_RUN_VULKAN_FUNC(vkAllocateMemory(*m_device, &colourMemAlloc, nullptr, &offscreenPass.colour.mem),"");
-		SAFE_RUN_VULKAN_FUNC(vkBindImageMemory(*m_device, offscreenPass.colour.image, offscreenPass.colour.mem, 0),"");
-
-		VkImageViewCreateInfo colourView{};
-		colourView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		colourView.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		colourView.format = offscreenPass.colourFormat;
-		colourView.subresourceRange = {};
-		colourView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		colourView.subresourceRange.baseMipLevel = 0;
-		colourView.subresourceRange.levelCount = 1;
-		colourView.subresourceRange.baseArrayLayer = 0;
-		colourView.subresourceRange.layerCount = 1;
-		colourView.image = offscreenPass.colour.image;
-		SAFE_RUN_VULKAN_FUNC(vkCreateImageView(*m_device, &colourView, nullptr, &offscreenPass.colour.view),"");
-
-		// Create sampler to sample from to depth attachment
-		// Used to sample in the fragment shader for shadowed rendering
-		VkSamplerCreateInfo sampler{};
-		sampler.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-		sampler.magFilter = VK_FILTER_LINEAR;
-		sampler.minFilter = VK_FILTER_LINEAR;
-
-		sampler.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-		sampler.addressModeV = sampler.addressModeU;
-		sampler.addressModeW = sampler.addressModeU;
-
-		sampler.anisotropyEnable = VK_TRUE;
-		sampler.maxAnisotropy = m_device->properties.limits.maxSamplerAnisotropy;
-
-		sampler.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-		sampler.unnormalizedCoordinates = VK_FALSE;
-
-		sampler.compareEnable = VK_FALSE;
-		sampler.compareOp = VK_COMPARE_OP_ALWAYS;
-
-		sampler.mipLodBias = 0.0f;
-		sampler.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-		sampler.minLod = 0.0f;
-		sampler.maxLod = 1.0f;
-
-		SAFE_RUN_VULKAN_FUNC(vkCreateSampler(*m_device, &sampler, nullptr, &offscreenPass.depthSampler), "");
+		auto width = 2048;
+		auto height = 2048;
 
 		prepareOffscreenRenderpass();
 
-		std::array<VkImageView, 2> views { offscreenPass.colour.view, offscreenPass.depth.view };
-
-		// Create frame buffer
-		VkFramebufferCreateInfo fbufCreateInfo{};
-		fbufCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		fbufCreateInfo.renderPass = offscreenPass.renderPass;
-		fbufCreateInfo.attachmentCount = static_cast<uint32_t>(views.size());
-		fbufCreateInfo.pAttachments = views.data();
-		fbufCreateInfo.width = offscreenPass.width;
-		fbufCreateInfo.height = offscreenPass.height;
-		fbufCreateInfo.layers = 1;
-
-		SAFE_RUN_VULKAN_FUNC(vkCreateFramebuffer(*m_device, &fbufCreateInfo, nullptr, &offscreenPass.frameBuffer),"");
+		offscreenPass.renderTexture = Scope<RenderTexture>(new RenderTexture(m_renderer->GetSwapChain().extent().width, m_renderer->GetSwapChain().extent().height, offscreenPass.renderPass));
 	}
 
 	void Application::buildPipeline()
@@ -450,6 +309,7 @@ namespace golem
 		EventDispatcher dispatcher(e);
 
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUNC(Application::OnWindowClose));
+		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FUNC(Application::OnWindowResize));
 
 		for(auto it = m_layerStack.end(); it != m_layerStack.begin();)
 		{
@@ -472,6 +332,26 @@ namespace golem
 	bool Application::OnWindowClose(WindowCloseEvent& e)
 	{
 		m_isRunning = false;
+
+		return true;
+	}
+
+	bool Application::OnWindowResize(WindowResizeEvent& e)
+	{
+		vkDeviceWaitIdle(*m_device);
+		offscreenPass.renderTexture.reset(new RenderTexture(e.GetWidth(), e.GetHeight(), offscreenPass.renderPass));
+
+		for (int i = 0; i < m_globalDescriptorSets.size(); i++)
+		{
+			VkDescriptorImageInfo descriptorImageInfo{};
+			descriptorImageInfo.sampler = offscreenPass.renderTexture->GetSampler()->getSampler();
+			descriptorImageInfo.imageView = offscreenPass.renderTexture->GetColourAttachment()->view;
+			descriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+			golem::DescriptorWriter(*m_globalSetLayout, *m_globalPool)
+				.WriteImage(0, &descriptorImageInfo)
+				.Overwrite(m_globalDescriptorSets[i]);
+		}
 
 		return true;
 	}
