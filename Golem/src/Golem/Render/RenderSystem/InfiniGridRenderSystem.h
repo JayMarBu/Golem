@@ -10,7 +10,7 @@ namespace golem
 	{
 		// Members ********************************************************************************
 	public:
-		bool render = true;
+		bool render = false;
 	private:
 		std::unique_ptr<DescriptorPool> m_pool;
 		std::unique_ptr<DescriptorSetLayout> m_setLayout;

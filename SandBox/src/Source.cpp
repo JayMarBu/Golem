@@ -187,7 +187,6 @@ public:
 		m_UBObuffers[fInfo.frameIndex]->WriteToBuffer(&ubo);
 		m_UBObuffers[fInfo.frameIndex]->Flush();
 
-
 		// ------ render scene ------
 		m_simpleRenderSystem->RenderGameObjects(fInfo, m_gameObjects);
 		m_pointLightRenderSystem->Render(fInfo, m_gameObjects);

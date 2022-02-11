@@ -2,7 +2,8 @@
 #include "ImGuiLayer.h"
 
 #include "imgui.h"
-#include "backends/imgui_impl_vulkan.h"
+//#include "backends/imgui_impl_vulkan.h"
+#include "Golem/ImGui/ViewPortFriendlyImGuiVulkanImpl.h"
 #include "backends/imgui_impl_glfw.h"
 #include "GLFW/glfw3.h"
 #include "Platform/Windows/WindowWin32.h"
@@ -49,10 +50,17 @@ namespace golem
 		ImGui::StyleColorsDark();
 		ImGuiIO& io = ImGui::GetIO();
 		(void)io;
-		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		// io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 		// io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+		ImGuiStyle& style = ImGui::GetStyle();
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			style.WindowRounding = 0.0f;
+			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+		}
 
 		/*io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
 		io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
@@ -85,13 +93,8 @@ namespace golem
 		init_info.Device = device.device();
 		init_info.QueueFamily = device.getGraphicsQueueFamily();
 		init_info.Queue = device.graphicsQueue();
-
-		// pipeline cache is a potential future optimization, ignoring for now
 		init_info.PipelineCache = VK_NULL_HANDLE;
 		init_info.DescriptorPool = m_descriptorPool->GetVKDescriptorPool();
-		// todo, I should probably get around to integrating a memory allocator library such as Vulkan
-		// memory allocator (VMA) sooner than later. We don't want to have to update adding an allocator
-		// in a ton of locations.
 		init_info.Allocator = VK_NULL_HANDLE;
 		init_info.MinImageCount = 2;
 		init_info.ImageCount = Application::Get().GetRenderer().GetImageCount();

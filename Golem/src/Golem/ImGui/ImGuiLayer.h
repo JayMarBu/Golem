@@ -5,6 +5,8 @@
 #include "../Events/ApplicationEvent.h"
 #include "../Render/Descriptors.h"
 
+
+
 namespace golem
 {
 	static void check_vk_result(VkResult err) {
@@ -19,6 +21,10 @@ namespace golem
 	private:
 		
 		std::unique_ptr<DescriptorPool> m_descriptorPool;
+
+		//ImGui_ImplVulkanH_Window m_ImGuiWindowHandle;
+
+		//uint32_t m_QueueFamily = (uint32_t)-1;
 
 		//VkDescriptorPool m_descriptorPool;
 		// Methods ********************************************************************************

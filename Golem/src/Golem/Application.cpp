@@ -110,7 +110,7 @@ namespace golem
 
 			// Temp -----------------------------
 			
-			VkClearColorValue defaultClearColor = { { 0.01f, 0.01f, 0.01f, 1.0f } };
+			VkClearColorValue defaultClearColor = { { 0.1f, 0.1f, 0.1f, 1.0f } };
 			VkClearValue clearValues[2];
 			VkViewport viewport{};
 			VkRect2D scissor{};
@@ -154,7 +154,7 @@ namespace golem
 			m_renderer->BeginSwapChainRenderPass(commandBuffer);
 
 			// Temp -----------------------------
-			testPipeline->Bind(commandBuffer);
+			/*testPipeline->Bind(commandBuffer);
 			vkCmdBindDescriptorSets(
 				commandBuffer,
 				VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -163,13 +163,20 @@ namespace golem
 				&m_globalDescriptorSets[m_renderer->GetFrameIndex()],
 				0, nullptr
 			);
-			vkCmdDraw(commandBuffer, 6, 1, 0, 0);
+			vkCmdDraw(commandBuffer, 6, 1, 0, 0);*/
 			// ----------------------------------
 
 			//for(auto layer : m_layerStack)
 			//	layer->OnRender(commandBuffer);
-
+			
 			m_guiLayer->Begin();
+
+			ImGui::Begin("Game Window");
+
+			ImGui::Image(m_globalDescriptorSets[m_renderer->GetFrameIndex()],ImGui::GetWindowSize());
+
+			ImGui::End();
+
 			for (auto layer : m_layerStack)
 				layer->OnImGuiRender();
 			m_guiLayer->End(commandBuffer);
@@ -179,9 +186,6 @@ namespace golem
 
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
-
-			for (auto layer : m_layerStack)
-				layer->OnPostRender();
 		}
 
 		vkDeviceWaitIdle(*m_device);

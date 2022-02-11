@@ -41,15 +41,7 @@ namespace golem
 
 		struct OffscreenPass 
 		{
-			//int32_t width, height;
-			//VkFramebuffer frameBuffer;
-			//FrameBufferAttachment depth;
-			//FrameBufferAttachment colour;
 			VkRenderPass renderPass;
-			//VkSampler depthSampler;
-			//VkDescriptorImageInfo descriptor;
-			//VkFormat colourFormat;
-			//VkFormat depthFormat;
 
 			Scope<RenderTexture> renderTexture; 
 		} offscreenPass;
