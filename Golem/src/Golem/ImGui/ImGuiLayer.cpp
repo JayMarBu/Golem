@@ -152,6 +152,15 @@ namespace golem
 		ImGui_ImplVulkan_RenderDrawData(drawdata, commandBuffer);
 	}
 
+	void ImGuiLayer::RenderGameWindow(Ref<RenderTexture> renderTexture)
+	{
+		ImGui::Begin("Game Window");
+
+		ImGui::Image(renderTexture->GetDescriptorSet(Application::Get().GetRenderer().GetFrameIndex()), ImGui::GetWindowSize());
+
+		ImGui::End();
+	}
+
 	bool ImGuiLayer::OnMouseButtonPressedEvent(MouseButtonPressedEvent& e)
 	{
 		ImGuiIO& io = ImGui::GetIO();

@@ -12,11 +12,11 @@ namespace golem
 	public:
 		bool render = false;
 	private:
-		std::unique_ptr<DescriptorPool> m_pool;
-		std::unique_ptr<DescriptorSetLayout> m_setLayout;
+		Scope<DescriptorPool> m_pool;
+		Scope<DescriptorSetLayout> m_setLayout;
 		std::vector<VkDescriptorSet> m_descriptorSets;
 
-		std::vector<std::unique_ptr<Buffer>> m_UBObuffers;
+		std::vector<Scope<Buffer>> m_UBObuffers;
 		// Methods ********************************************************************************
 	public:
 		InfiniGridRenderSystem(Device& device);
@@ -29,5 +29,9 @@ namespace golem
 			VkDescriptorSetLayout descriptorSet,
 			uint32_t pushConstantSize,
 			VkShaderStageFlags pushConstantShaderStages);
+
+		void CreateDescriptors();
+
+		void CreateMainPipeline();
 	};
 }

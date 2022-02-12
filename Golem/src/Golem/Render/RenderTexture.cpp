@@ -36,6 +36,7 @@ namespace golem
 		CreateDepthStencilAttachment(device);
 		CreateSampler(device);
 		CreateFrameBuffer(device, renderPass);
+		CreateDescriptorSets(device);
 	}
 
 	void RenderTexture::CreateColourAttachment(Device& device)
@@ -168,6 +169,31 @@ namespace golem
 		fbufCreateInfo.layers = 1;
 
 		SAFE_RUN_VULKAN_FUNC(vkCreateFramebuffer(device, &fbufCreateInfo, nullptr, &m_frameBuffer), "");
+	}
+
+	void RenderTexture::CreateDescriptorSets(Device& device)
+	{
+		m_descriptorPool = golem::DescriptorPool::Builder(device)
+			.SetMaxSets(golem::SwapChain::MAX_FRAMES_IN_FLIGHT)
+			.AddPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, golem::SwapChain::MAX_FRAMES_IN_FLIGHT)
+			.Build();
+
+		m_descriptorSetLayout = golem::DescriptorSetLayout::Builder(device)
+			.AddBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+			.Build();
+
+		m_descriptorSets.resize(golem::SwapChain::MAX_FRAMES_IN_FLIGHT);
+		for (int i = 0; i < m_descriptorSets.size(); i++)
+		{
+			VkDescriptorImageInfo descriptorImageInfo{};
+			descriptorImageInfo.sampler = m_sampler->getSampler();
+			descriptorImageInfo.imageView = GetColourAttachment()->view;
+			descriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+			golem::DescriptorWriter(*m_descriptorSetLayout, *m_descriptorPool)
+				.WriteImage(0, &descriptorImageInfo)
+				.Build(m_descriptorSets[i]);
+		}
 	}
 
 }

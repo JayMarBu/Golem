@@ -4,6 +4,7 @@
 #include "../Events/KeyEvent.h"
 #include "../Events/ApplicationEvent.h"
 #include "../Render/Descriptors.h"
+#include "../Render/RenderTexture.h"
 
 
 
@@ -39,6 +40,8 @@ namespace golem
 
 		void Begin();
 		void End(VkCommandBuffer commandBuffer);
+
+		void RenderGameWindow(Ref<RenderTexture> renderTexture);
 	private: 
 		bool OnMouseButtonPressedEvent(MouseButtonPressedEvent& e);
 		bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& e);

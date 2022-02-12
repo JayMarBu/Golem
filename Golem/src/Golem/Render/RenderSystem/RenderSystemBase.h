@@ -12,7 +12,7 @@ namespace golem
 		// Rendering data
 		Device& m_device;
 
-		std::unique_ptr<Pipeline> m_pipeline;
+		Scope<Pipeline> m_pipeline;
 		VkPipelineLayout m_pipelineLayout;
 
 		ShaderPaths m_shaderPaths;

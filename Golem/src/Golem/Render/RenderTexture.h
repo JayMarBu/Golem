@@ -2,6 +2,9 @@
 #include "Golem/Render/Objects/Sampler.h"
 #include "Device.h"
 
+#include "Golem/Render/Buffer.h"
+#include "Golem/Render/Descriptors.h"
+
 namespace golem
 {
 	class RenderTexture
@@ -22,9 +25,11 @@ namespace golem
 		VkFramebuffer m_frameBuffer;
 		FrameBufferAttachment m_depth;
 		FrameBufferAttachment m_colour;
-		//VkSampler m_sampler;
-
 		Ref<Sampler> m_sampler;
+
+		Scope<DescriptorPool> m_descriptorPool;
+		Scope<DescriptorSetLayout> m_descriptorSetLayout;
+		std::vector<VkDescriptorSet> m_descriptorSets;
 
 		// Methods ********************************************************************************
 	public:
@@ -40,6 +45,9 @@ namespace golem
 
 		VkFramebuffer GetFrameBuffer() const { return m_frameBuffer; }
 
+		VkDescriptorSet GetDescriptorSet(uint32_t i) const { return m_descriptorSets[i];}
+		VkDescriptorSetLayout GetDescriptorSetLayout() const {return m_descriptorSetLayout->GetDescriptorSetLayout();}
+
 	private:
 		void Init(VkRenderPass renderPass);
 
@@ -47,5 +55,6 @@ namespace golem
 		void CreateDepthStencilAttachment(Device& device);
 		void CreateSampler(Device& device);
 		void CreateFrameBuffer(Device& device, VkRenderPass renderPass);
+		void CreateDescriptorSets(Device& device);
 	};
 }

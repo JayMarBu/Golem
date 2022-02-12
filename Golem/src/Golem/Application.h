@@ -10,13 +10,8 @@
 #include "Temp/TextureManager.h"
 #include "ThreadPool.h"
 
-// Temp -----------------------------------------
-#include "Temp/TempGameObject.h"
-#include "Render/RenderSystem/SimpleRenderSystem.h"
-#include "Render/Objects/Sampler.h"
 #include "Render/RenderTexture.h"
 
-// ----------------------------------------------
 
 namespace golem
 {
@@ -32,37 +27,12 @@ namespace golem
 		// Temp stuff ---------------------------------------------------------
 		Scope<TextureManager> m_textureManager;
 
-		struct FrameBufferAttachment 
-		{
-			VkImage image;
-			VkDeviceMemory mem;
-			VkImageView view;
-		};
-
 		struct OffscreenPass 
 		{
 			VkRenderPass renderPass;
 
-			Scope<RenderTexture> renderTexture; 
+			Ref<RenderTexture> renderTexture; 
 		} offscreenPass;
-
-		std::vector<TempGameObject> temp_gameobjects;
-
-		golem::Scope<golem::DescriptorPool> m_globalPool;
-		golem::Scope<golem::DescriptorSetLayout> m_globalSetLayout;
-		std::vector<VkDescriptorSet> m_globalDescriptorSets;
-
-		std::vector<golem::Scope<golem::Buffer>> m_UBObuffers;
-
-		golem::Scope<golem::SimpleRenderSystem> m_simpleRenderSystem;
-
-		golem::Camera camera{};
-		TempGameObject m_camGobj;
-
-		golem::Scope<golem::Sampler> m_sampler;
-
-		Scope<Pipeline> testPipeline; 
-		VkPipelineLayout m_pipelineLayout;
 
 		// --------------------------------------------------------------------
 
@@ -97,9 +67,8 @@ namespace golem
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 
-		void prepareOffscreenRenderpass();
-		void prepareOffscreenFramebuffer();
-		void buildPipeline();
+		void PrepareOffscreenRenderpass();
+		void BeginRenderPass(VkCommandBuffer commandBuffer);
 	};
 
 	// To be defined in client
