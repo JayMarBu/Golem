@@ -48,6 +48,8 @@ namespace golem
 		VkDescriptorSet GetDescriptorSet(uint32_t i) const { return m_descriptorSets[i];}
 		VkDescriptorSetLayout GetDescriptorSetLayout() const {return m_descriptorSetLayout->GetDescriptorSetLayout();}
 
+		void Resize(uint32_t width, uint32_t height, VkRenderPass renderPass);
+
 	private:
 		void Init(VkRenderPass renderPass);
 
@@ -56,5 +58,7 @@ namespace golem
 		void CreateSampler(Device& device);
 		void CreateFrameBuffer(Device& device, VkRenderPass renderPass);
 		void CreateDescriptorSets(Device& device);
+
+		void Cleanup();
 	};
 }

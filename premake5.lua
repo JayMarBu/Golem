@@ -96,6 +96,71 @@ project "Golem"
 		optimize "on"
 		runtime "Release"
 
+project "Golem-Editor"
+	location "Golem-Editor"
+	kind "ConsoleApp"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "on"
+	
+	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+	files
+	{
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/shaders/**.vert",
+		"%{prj.name}/shaders/**.frag"
+	}
+
+	includedirs
+	{
+		"$(VULKAN_SDK)/Include",
+		"Golem/external/spdlog/include",
+		"Golem/src",
+		"Golem/external",
+		"%{IncludeDir.glm}"
+	}
+
+	links
+	{
+		"$(VULKAN_SDK)/Lib/vulkan-1.lib",
+		"Golem"
+	}
+
+	filter "system:windows"
+		systemversion "latest"
+
+		defines
+		{
+			"GOL_PLATFORM_WINDOWS"
+		}
+
+		postbuildcommands
+		{
+			"for /R %%f in (*.vert *.frag ) do ( \n"..
+				"echo Compiling: %%f\n"..
+				"%VULKAN_SDK%/Bin/glslc.exe %%f -o %%f.spv\n"..
+				"echo.\n"..
+				")"
+		}
+
+	filter "configurations:Debug"
+		defines "GOL_DEBUG"
+		symbols "on"
+		runtime "Debug"
+
+	filter "configurations:Release"
+		defines "GOL_RELEASE"
+		optimize "on"
+		runtime "Release"
+
+	filter "configurations:Dist"
+		defines "GOL_DIST"
+		optimize "on" 
+		runtime "Release"
+
 project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
@@ -130,8 +195,6 @@ project "Sandbox"
 		"Golem"
 	}
 
-	
-
 	filter "system:windows"
 		systemversion "latest"
 
@@ -151,19 +214,11 @@ project "Sandbox"
 
 	filter "configurations:Debug"
 		defines "GOL_DEBUG"
-		--links 
-		--{
-		--	"$(VULKAN_SDK)/Lib/shaderc_combinedd.lib"
-		--}
 		symbols "on"
 		runtime "Debug"
 
 	filter "configurations:Release"
 		defines "GOL_RELEASE"
-		--links 
-		--{
-		--	"$(VULKAN_SDK)/Lib/shaderc_combined.lib"
-		--}
 		optimize "on"
 		runtime "Release"
 

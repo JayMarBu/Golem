@@ -10,12 +10,12 @@ namespace golem
 	struct WindowProps
 	{
 		std::string title;
-		unsigned int width;
-		unsigned int height;
+		uint32_t width;
+		uint32_t height;
 
 		WindowProps(const std::string& _title = "Golem App",	
-					unsigned int _width = 1600,
-					unsigned int _height = 900)
+					uint32_t _width = 1600,
+					uint32_t _height = 900)
 			: title{_title}, width{_width}, height{_height}
 		{
 		}
@@ -42,8 +42,8 @@ namespace golem
 
 		virtual void OnUpdate() = 0;
 
-		virtual unsigned int GetWidth() const = 0;
-		virtual unsigned int GetHeight() const = 0;
+		virtual uint32_t GetWidth() const = 0;
+		virtual uint32_t GetHeight() const = 0;
 
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
 		virtual void SetVSync(bool enabled) = 0;

@@ -30,14 +30,15 @@ namespace golem
 		float moveSpeed{ 1.f };
 		float turnSpeed{ 5.f };
 
-		int deltax, deltay;
+		float deltax, deltay;
+		float displayDeltax, displayDeltay;
 
 		bool two_D = true;
 		// Methods ********************************************************************************
 
 	public:
 
-		void MoveInPlaneXZ(float dt, TempGameObject& gameObject);
+		void MoveInPlaneXZ(float dt, TempGameObject& gameObject, glm::vec2 viewCentre);
 		void MoveInPlaneXY(float dt, TempGameObject& gameObject);
 
 		void DrawGui(TempGameObject& gameObject);

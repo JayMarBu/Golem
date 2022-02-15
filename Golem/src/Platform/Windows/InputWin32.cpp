@@ -52,11 +52,13 @@ namespace golem
 	{
 		const auto window = Application::Get().GetWindow().GetNativeWindow();
 
-		glfwSetCursorPos(static_cast<GLFWwindow*>(window), x, y);
+		glfwSetCursorPos(static_cast<GLFWwindow*>(window), (double)x, (double)y);
 	}
 
 	void InputWin32::SetMousePosCentreImpl()
 	{
+		GOL_PROFILE_FUNCTION();
+
 		auto& window = Application::Get().GetWindow();
 		SetMousePosImpl(window.GetWidth()/2,window.GetHeight()/2);
 	}

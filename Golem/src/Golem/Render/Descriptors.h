@@ -25,7 +25,7 @@ namespace golem
 				VkDescriptorType descriptorType,
 				VkShaderStageFlags stageFlags,
 				uint32_t count = 1);
-			std::unique_ptr<DescriptorSetLayout> Build() const;
+			Scope<DescriptorSetLayout> Build() const;
 
 		};
 
@@ -69,7 +69,7 @@ namespace golem
 			Builder& AddPoolSize(VkDescriptorType descriptorType, uint32_t count);
 			Builder& SetPoolFlags(VkDescriptorPoolCreateFlags flags);
 			Builder& SetMaxSets(uint32_t count);
-			std::unique_ptr<DescriptorPool> Build() const;
+			Scope<DescriptorPool> Build() const;
 		};
 
 	private:

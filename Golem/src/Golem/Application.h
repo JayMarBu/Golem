@@ -27,12 +27,7 @@ namespace golem
 		// Temp stuff ---------------------------------------------------------
 		Scope<TextureManager> m_textureManager;
 
-		struct OffscreenPass 
-		{
-			VkRenderPass renderPass;
-
-			Ref<RenderTexture> renderTexture; 
-		} offscreenPass;
+		double m_deltaTime = 0;
 
 		// --------------------------------------------------------------------
 
@@ -42,20 +37,25 @@ namespace golem
 		LayerStack m_layerStack;
 
 		std::mutex m_eventMutex;
+		std::queue<Event*> m_events;
 	private:
 		static Application* s_instance;
 		// Methods ********************************************************************************
 	public:
-		Application();
+		Application(const std::string& name = "Golem App");
 		virtual ~Application();
 
 		static Application& Get() {return *s_instance;}
 
 		inline ThreadPool& GetThreadPool() {return m_threadPool;}
 		inline Window& GetWindow() { return *m_window;}
+		inline Window* GetWindowPtr() { return m_window.get();}
 		inline Device& GetDevice() { return *m_device;}
 		inline Renderer& GetRenderer() { return *m_renderer;}
 		inline TextureManager& GetTextureManager() { return *m_textureManager;}
+
+		static void FireEvent(Event* e);
+		static double DeltaTime() {return s_instance->m_deltaTime;}
 
 		void Run();
 
@@ -67,8 +67,8 @@ namespace golem
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 
-		void PrepareOffscreenRenderpass();
-		void BeginRenderPass(VkCommandBuffer commandBuffer);
+		void PollEvents();
+
 	};
 
 	// To be defined in client

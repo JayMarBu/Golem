@@ -45,6 +45,8 @@ namespace golem
 
 	void Renderer::EndFrame()
 	{
+		GOL_PROFILE_FUNCTION();
+
 		assert(m_isFrameStarted && "cant end frame while frame is not in progress. use BeginFrame() to start new frame");
 
 		auto commandBuffer = GetCurrentCommandBuffer();

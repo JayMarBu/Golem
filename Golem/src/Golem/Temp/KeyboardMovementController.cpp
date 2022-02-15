@@ -7,12 +7,15 @@
 
 #include "imgui.h"
 #include "../Application.h"
+#include "GLFW/glfw3.h"
 
 namespace golem
 {
 
-	void KeyboardMovementController::MoveInPlaneXZ(float dt, TempGameObject& gameObject)
+	void KeyboardMovementController::MoveInPlaneXZ(float dt, TempGameObject& gameObject, glm::vec2 viewCentre)
 	{
+		GOL_PROFILE_FUNCTION();
+
 		glm::vec3 rotate{ 0.0f };
 
 		if (Input::IsKeyPressed(keys.lookRight))
@@ -26,32 +29,45 @@ namespace golem
 
 		if (Input::IsMouseButtonPressed(GOL_MOUSE_BUTTON_RIGHT))
 		{
-			Input::SetMouseCursorHidden(true);
+			GOL_PROFILE_SCOPE("KeyboardMovementController::MoveInPlaneXZ -> mouse button down");
+		
+			auto window = Application::Get().GetWindowPtr();
 
-			auto& window = Application::Get().GetWindow();
+			static int winXPos, winYPos;
+			{
+				GOL_PROFILE_SCOPE("KeyboardMovementController::MoveInPlaneXZ -> mouse button down -> get window pos");
+				glfwGetWindowPos(static_cast<GLFWwindow*>(window->GetNativeWindow()), &winXPos, &winYPos);
+			}
 
-			deltax = Input::GetMouseX() - (window.GetExtent().width / 2);
-			deltay = Input::GetMouseY() - (window.GetExtent().height / 2);
+			{
+				GOL_PROFILE_SCOPE("KeyboardMovementController::MoveInPlaneXZ -> mouse button down -> calculate deltas");
+				deltax = (Input::GetMouseX() + winXPos) - (glm::floor(viewCentre.x));
+				deltay = (Input::GetMouseY() + winYPos) - (glm::floor(viewCentre.y));
 
-			rotate.y += turnSpeed * dt * (float)deltax;
-			rotate.x -= turnSpeed * dt * (float)deltay;
+				rotate.y += turnSpeed * dt * (float)deltax;
+				rotate.x -= turnSpeed * dt * (float)deltay;
+			}
 
-			Input::SetMousePosCentre();
+			//Input::SetMousePosCentre();
+			Input::SetMousePos(viewCentre.x - winXPos, viewCentre.y - winYPos);
 		}
-		else
+
 		{
-			Input::SetMouseCursorHidden(false);
-		}
-
-		if (VecIsZero(rotate))
-		{
-			glm::vec3 rot = gameObject.transform.EulerAngles() + turnSpeed * dt * glm::normalize(rotate);
-			gameObject.transform.Rotation(rot);
-		}
+			GOL_PROFILE_SCOPE("KeyboardMovementController::MoveInPlaneXZ -> transform rotations");
+		
+			if (VecIsZero(rotate))
+			{
+				glm::vec3 rot = gameObject.transform.EulerAngles() + turnSpeed * dt * glm::normalize(rotate);
+				gameObject.transform.Rotation(rot);
+			}
 			
 		
-		gameObject.transform.RotationX(glm::clamp(gameObject.transform.EulerAngles().x, -1.5f, 1.5f));
-		gameObject.transform.RotationY(glm::mod(gameObject.transform.EulerAngles().y, glm::two_pi<float>()));
+			gameObject.transform.RotationX(glm::clamp(gameObject.transform.EulerAngles().x, -1.5f, 1.5f));
+			gameObject.transform.RotationY(glm::mod(gameObject.transform.EulerAngles().y, glm::two_pi<float>()));
+
+		}
+
+		GOL_PROFILE_SCOPE("KeyboardMovementController::MoveInPlaneXZ -> translation");
 
 		float yaw = gameObject.transform.EulerAngles().y;
 		const glm::vec3 forwardDir{ sin(yaw), 0.0f, cos(yaw) };

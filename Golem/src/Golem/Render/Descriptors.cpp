@@ -1,5 +1,6 @@
 #include "golpch.h"
 #include "Golem/Render/Descriptors.h"
+#include "Golem/Core.h"
 
 namespace golem
 {
@@ -20,9 +21,9 @@ namespace golem
 		return *this;
 	}
 
-	std::unique_ptr<DescriptorSetLayout> DescriptorSetLayout::Builder::Build() const
+	Scope<DescriptorSetLayout> DescriptorSetLayout::Builder::Build() const
 	{
-		return std::make_unique<DescriptorSetLayout>(m_device, m_bindings);
+		return CreateScope<DescriptorSetLayout>(m_device, m_bindings);
 	}
 
 	// ******************************************************************************************//
@@ -74,9 +75,9 @@ namespace golem
 		return *this;
 	}
 
-	std::unique_ptr<DescriptorPool> DescriptorPool::Builder::Build() const
+	Scope<DescriptorPool> DescriptorPool::Builder::Build() const
 	{
-		return std::make_unique<DescriptorPool>(m_device, m_maxSets, m_poolFlags, m_poolSizes);
+		return CreateScope<DescriptorPool>(m_device, m_maxSets, m_poolFlags, m_poolSizes);
 	}
 
 	// ******************************************************************************************//

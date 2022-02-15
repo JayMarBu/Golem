@@ -2,7 +2,6 @@
 #include "ImGuiLayer.h"
 
 #include "imgui.h"
-//#include "backends/imgui_impl_vulkan.h"
 #include "Golem/ImGui/ViewPortFriendlyImGuiVulkanImpl.h"
 #include "backends/imgui_impl_glfw.h"
 #include "GLFW/glfw3.h"
@@ -131,18 +130,11 @@ namespace golem
 		dispatcher.Dispatch<KeyTypedEvent>(BIND_EVENT_FUNC(ImGuiLayer::OnKeyTypedEvent));
 	}
 
-	void ImGuiLayer::OnImGuiRender()
-	{
-		static bool open = true;
-		ImGui::ShowDemoWindow(&open);
-	}
-
 	void ImGuiLayer::Begin()
 	{
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-
 	}
 
 	void ImGuiLayer::End(VkCommandBuffer commandBuffer)
@@ -152,37 +144,32 @@ namespace golem
 		ImGui_ImplVulkan_RenderDrawData(drawdata, commandBuffer);
 	}
 
-	void ImGuiLayer::RenderGameWindow(Ref<RenderTexture> renderTexture)
-	{
-		ImGui::Begin("Game Window");
-
-		ImGui::Image(renderTexture->GetDescriptorSet(Application::Get().GetRenderer().GetFrameIndex()), ImGui::GetWindowSize());
-
-		ImGui::End();
-	}
-
 	bool ImGuiLayer::OnMouseButtonPressedEvent(MouseButtonPressedEvent& e)
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		return io.WantCaptureMouse;
+		//return io.WantCaptureMouse;
+		return false;
 	}
 
 	bool ImGuiLayer::OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& e)
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		return io.WantCaptureMouse;
+		//return io.WantCaptureMouse;
+		return false;
 	}
 
 	bool ImGuiLayer::OnMouseMovedEvent(MouseMovedEvent& e)
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		return io.WantCaptureMouse;
+		//return io.WantCaptureMouse;
+		return false;
 	}
 
 	bool ImGuiLayer::OnMouseScrollEvent(MouseScrolledEvent& e)
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		return io.WantCaptureMouse;
+		//return io.WantCaptureMouse;
+		return false;
 	}
 
 	bool ImGuiLayer::OnKeyPressedEvent(KeyPressedEvent& e)

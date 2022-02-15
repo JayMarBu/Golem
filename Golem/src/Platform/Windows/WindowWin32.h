@@ -34,8 +34,8 @@ namespace golem
 
 		void OnUpdate() override;
 
-		inline unsigned int GetWidth() const override {return m_data.width;}
-		inline unsigned int GetHeight() const override {return m_data.height;}
+		inline uint32_t GetWidth() const override {return m_data.width;}
+		inline uint32_t GetHeight() const override {return m_data.height;}
 
 		inline virtual void SetEventCallback(const EventCallbackFn& callback) override {m_data.eventCallback = callback;}
 		virtual void SetVSync(bool enabled);

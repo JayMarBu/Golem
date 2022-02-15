@@ -11,6 +11,7 @@
 #include "Golem/Input/KeyCodes.h"
 #include "Golem/Events/Event.h"
 #include "Golem/ThreadPool.h"
+#include "Golem/Time.h"
 
 // Rendering **************************************************************************************
 #include "Golem/Render/Buffer.h"
@@ -21,6 +22,7 @@
 #include "Golem/Render/Objects/Model.h"
 #include "Golem/Render/Objects/Sampler.h"
 #include "Golem/Render/Objects/Texture.h"
+#include "Golem/Render/RenderTexture.h"
 #include "Golem/Render/Pipeline.h"
 #include "Golem/Render/RenderSystem/RenderSystemBase.h"
 

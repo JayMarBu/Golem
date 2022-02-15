@@ -14,7 +14,7 @@ namespace golem
 		AppTick, AppUpdate, AppRender,
 		KeyPressed, KeyReleased, KeyTyped,
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled,
-		ShaderRecompiled
+		ShaderRecompiled, ViewportResized
 	};
 
 	enum EventCategory

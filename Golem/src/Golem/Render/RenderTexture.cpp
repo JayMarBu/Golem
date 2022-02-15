@@ -13,19 +13,33 @@ namespace golem
 
 	RenderTexture::~RenderTexture()
 	{
+		Cleanup();
+	}
+
+	void RenderTexture::Resize(uint32_t width, uint32_t height, VkRenderPass renderPass)
+	{
+		m_width = width;
+		m_height = height;
+
 		auto& device = Application::Get().GetDevice();
 
-		// colour attachment
-		vkDestroyImageView(device, m_colour.view, nullptr);
-		vkDestroyImage(device, m_colour.image, nullptr);
-		vkFreeMemory(device, m_colour.mem, nullptr);
+		Cleanup();
 
-		// Depth attachment
-		vkDestroyImageView(device, m_depth.view, nullptr);
-		vkDestroyImage(device, m_depth.image, nullptr);
-		vkFreeMemory(device, m_depth.mem, nullptr);
+		CreateColourAttachment(device);
+		CreateDepthStencilAttachment(device);
+		CreateFrameBuffer(device, renderPass);
 
-		vkDestroyFramebuffer(device, m_frameBuffer, nullptr);
+		for (int i = 0; i < m_descriptorSets.size(); i++)
+		{
+			VkDescriptorImageInfo descriptorImageInfo{};
+			descriptorImageInfo.sampler = m_sampler->getSampler();
+			descriptorImageInfo.imageView = GetColourAttachment()->view;
+			descriptorImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+			golem::DescriptorWriter(*m_descriptorSetLayout, *m_descriptorPool)
+				.WriteImage(0, &descriptorImageInfo)
+				.Overwrite(m_descriptorSets[i]);
+		}
 	}
 
 	void RenderTexture::Init(VkRenderPass renderPass)
@@ -194,6 +208,23 @@ namespace golem
 				.WriteImage(0, &descriptorImageInfo)
 				.Build(m_descriptorSets[i]);
 		}
+	}
+
+	void RenderTexture::Cleanup()
+	{
+		auto& device = Application::Get().GetDevice();
+
+		// colour attachment
+		vkDestroyImageView(device, m_colour.view, nullptr);
+		vkDestroyImage(device, m_colour.image, nullptr);
+		vkFreeMemory(device, m_colour.mem, nullptr);
+
+		// Depth attachment
+		vkDestroyImageView(device, m_depth.view, nullptr);
+		vkDestroyImage(device, m_depth.image, nullptr);
+		vkFreeMemory(device, m_depth.mem, nullptr);
+
+		vkDestroyFramebuffer(device, m_frameBuffer, nullptr);
 	}
 
 }

@@ -160,7 +160,7 @@ public:
 		m_timer.frame();
 
 		// ------ update camera ------
-		m_camera.controller.MoveInPlaneXZ(m_timer.getTime(), m_camera.gObject);
+		m_camera.controller.MoveInPlaneXZ(m_timer.getTime(), m_camera.gObject, glm::vec2{1.0f});
 		m_camera.camera.SetViewXYZ(m_camera.gObject.transform.translation, m_camera.gObject.transform.EulerAngles());
 
 		float aspect = golem::Application::Get().GetRenderer().GetAspectRatio();

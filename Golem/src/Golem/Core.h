@@ -25,13 +25,29 @@
 #define  MAP_CONTAINS(_map_,_val_) (_map_.find(_val_) != _map_.end())
 #define  LOOP_MAP_ITEMS(_map_, _it_) auto _it_ = _map_.begin(); _it_ != _map_.end(); _it_++
 
+#define COMBINE1(X,Y) X##Y  // helper macro
+#define COMBINE(X,Y) COMBINE1(X,Y)
 
 #include <memory>
 namespace golem
 {
+	// will eventually replace these with custom types
+	// with intrusive ref counting. Using aliases for now
+	// to make it less of a headache to implement later
+
 	template <typename T>
 	using Scope = std::unique_ptr<T>;
+	template <typename T, typename... Args>
+	constexpr Scope<T> CreateScope(Args&&... args)
+	{
+		return std::make_unique<T>(std::forward<Args>(args)...);
+	}
 
 	template <typename T>
 	using Ref = std::shared_ptr<T>;
+	template <typename T, typename... Args>
+	constexpr Ref<T> CreateRef(Args&&... args)
+	{
+		return std::make_shared<T>(std::forward<Args>(args)...);
+	}
 }
