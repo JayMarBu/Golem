@@ -10,9 +10,9 @@ namespace golem
 
 		// Methods ********************************************************************************
 	protected:
-		virtual bool IsKeyPressedImpl(int keycode) override;
+		virtual bool IsKeyPressedImpl(KeyCode keycode) override;
 
-		virtual bool IsMouseButtonPressedImpl(int button) override;
+		virtual bool IsMouseButtonPressedImpl(MouseCode button) override;
 		virtual float GetMouseXImpl() override;
 		virtual float GetMouseYImpl() override;
 		virtual MousePos GetMousePosImpl() override;

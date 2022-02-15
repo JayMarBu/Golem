@@ -27,7 +27,7 @@ namespace golem
 		if (Input::IsKeyPressed(keys.lookDown))
 			rotate.x -= 1;
 
-		if (Input::IsMouseButtonPressed(GOL_MOUSE_BUTTON_RIGHT))
+		if (Input::IsMouseButtonPressed(MouseCode::BUTTON_RIGHT))
 		{
 			GOL_PROFILE_SCOPE("KeyboardMovementController::MoveInPlaneXZ -> mouse button down");
 		
@@ -105,9 +105,9 @@ namespace golem
 			moveDir += rightDir;
 		if (Input::IsKeyPressed(keys.moveLeft))
 			moveDir -= rightDir;
-		if (Input::IsKeyPressed('Q'))
+		if (Input::IsKeyPressed((KeyCode)'Q'))
 			moveDir += forwardDir;
-		if (Input::IsKeyPressed('E'))
+		if (Input::IsKeyPressed((KeyCode)'E'))
 			moveDir -= forwardDir;
 		if (Input::IsKeyPressed(keys.moveForward))
 			moveDir += upDir;

@@ -23,9 +23,9 @@ namespace golem
 		};
 		// Methods ********************************************************************************
 	public:
-		inline static bool IsKeyPressed(int keycode) { return s_instance->IsKeyPressedImpl(keycode); }
+		inline static bool IsKeyPressed(KeyCode keycode) { return s_instance->IsKeyPressedImpl(keycode); }
 
-		inline static bool IsMouseButtonPressed(int button) { return s_instance->IsMouseButtonPressedImpl(button); }
+		inline static bool IsMouseButtonPressed(MouseCode button) { return s_instance->IsMouseButtonPressedImpl(button); }
 
 		inline static float GetMouseX() { return s_instance->GetMouseXImpl(); }
 		inline static float GetMouseY() { return s_instance->GetMouseYImpl(); }
@@ -36,8 +36,8 @@ namespace golem
 		inline static void SetMouseCursorHidden(bool hidden) {s_instance->SetMouseCursorHiddenImpl(hidden);}
 
 	protected:
-		virtual bool IsKeyPressedImpl(int keycode) = 0;
-		virtual bool IsMouseButtonPressedImpl(int button) = 0;
+		virtual bool IsKeyPressedImpl(KeyCode keycode) = 0;
+		virtual bool IsMouseButtonPressedImpl(MouseCode button) = 0;
 		virtual float GetMouseXImpl() = 0;
 		virtual float GetMouseYImpl() = 0;
 		virtual MousePos GetMousePosImpl() = 0;

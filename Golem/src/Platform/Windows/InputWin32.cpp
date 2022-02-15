@@ -7,20 +7,20 @@ namespace golem
 {
 	Input* Input::s_instance = new InputWin32();
 
-	bool InputWin32::IsKeyPressedImpl(int keycode)
+	bool InputWin32::IsKeyPressedImpl(KeyCode keycode)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 
-		auto state = glfwGetKey(window, keycode);
+		auto state = glfwGetKey(window, (int)(uint16_t)keycode);
 
 		return state == GLFW_PRESS;
 	}
 
-	bool InputWin32::IsMouseButtonPressedImpl(int button)
+	bool InputWin32::IsMouseButtonPressedImpl(MouseCode button)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 
-		auto state = glfwGetMouseButton(window, button);
+		auto state = glfwGetMouseButton(window, (int)(uint16_t)button);
 
 		return state == GLFW_PRESS;
 	}

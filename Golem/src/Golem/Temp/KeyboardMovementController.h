@@ -12,17 +12,17 @@ namespace golem
 
 		struct KeyMappings
 		{
-			int moveLeft = GOL_KEY_A;
-			int moveRight = GOL_KEY_D;
-			int moveForward = GOL_KEY_W;
-			int moveBack = GOL_KEY_S;
-			int moveUp = GOL_KEY_SPACE;
-			int moveDown = GOL_KEY_Q;
+			KeyCode moveLeft = KeyCode::A;
+			KeyCode moveRight = KeyCode::D;
+			KeyCode moveForward = KeyCode::W;
+			KeyCode moveBack = KeyCode::S;
+			KeyCode moveUp = KeyCode::SPACE;
+			KeyCode moveDown = KeyCode::Q;
 
-			int lookLeft = GOL_KEY_LEFT;
-			int lookRight = GOL_KEY_RIGHT;
-			int lookUp = GOL_KEY_UP;
-			int lookDown = GOL_KEY_DOWN;
+			KeyCode lookLeft = KeyCode::LEFT;
+			KeyCode lookRight = KeyCode::RIGHT;
+			KeyCode lookUp = KeyCode::UP;
+			KeyCode lookDown = KeyCode::DOWN;
 		};
 
 		KeyMappings keys{};
