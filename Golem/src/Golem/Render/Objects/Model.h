@@ -36,8 +36,8 @@ namespace golem
 		void Bind(VkCommandBuffer commandBuffer);
 		void Draw(VkCommandBuffer commandBuffer);
 
-		static std::unique_ptr<Model> CreateModelFromFile(Device& device, const std::string& filepath);
-		static std::unique_ptr<Model> CreateModelFromPrimative(Device& device, PrimitiveFunc primative, bool useIndex = true, glm::vec3 colour = { 1,1,1 });
+		static Ref<Model> CreateModelFromFile(Device& device, const std::string& filepath);
+		static Ref<Model> CreateModelFromPrimative(Device& device, PrimitiveFunc primative, bool useIndex = true, glm::vec3 colour = { 1,1,1 });
 
 	private:
 

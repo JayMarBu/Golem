@@ -15,20 +15,7 @@
 
 namespace golem
 {
-	struct CameraWrapper
-	{
-		CameraWrapper() : gObject(golem::TempGameObject::Create()) {}
-
-		golem::Camera camera{};
-		golem::TempGameObject gObject;
-		golem::KeyboardMovementController controller{};
-	};
-
-	struct ProfilerInfo
-	{
-		const char* name;
-
-	};
+	class GameObject;
 
 	class EditorLayer : public Layer
 	{
@@ -43,8 +30,7 @@ namespace golem
 		Scope<SimpleRenderSystem> m_simpleRenderSystem;
 		Scope<PointLightRenderSystem> m_pointLightRenderSystem;
 
-		std::vector<TempGameObject> m_gameObjects;
-		CameraWrapper m_camera{};
+		GameObject m_camera;
 
 		Scope<Sampler> m_sampler;
 
@@ -70,8 +56,7 @@ namespace golem
 
 	private:
 		void CreateRenderPass();
-		void CreateTempGameObjects();
-		void CreateTempLights();
+		void CreateScene();
 		void CreateUBO();
 		void CreateDescriptors();
 		void CreateRenderSystems();

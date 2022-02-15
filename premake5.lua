@@ -16,6 +16,7 @@ IncludeDir["imgui"] = "Golem/external/imgui"
 IncludeDir["glm"] = "Golem/external/glm"
 IncludeDir["tinyobj"] = "Golem/external/tinyobjloader"
 IncludeDir["stb"] = "Golem/external/stb"
+IncludeDir["entt"] = "Golem/external/entt"
 
 group "Dependancies"
 	include "external/premake/glfw"
@@ -58,7 +59,8 @@ project "Golem"
 		"%{IncludeDir.imgui}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.tinyobj}",
-		"%{IncludeDir.stb}"
+		"%{IncludeDir.stb}",
+		"%{IncludeDir.entt}"
 	}
 
 	filter "system:windows"
@@ -120,7 +122,8 @@ project "Golem-Editor"
 		"Golem/external/spdlog/include",
 		"Golem/src",
 		"Golem/external",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
 	}
 
 	links
@@ -186,7 +189,7 @@ project "Sandbox"
 		"Golem/src",
 		"Golem/external",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.tinyobj}"
+		"%{IncludeDir.entt}"
 	}
 
 	links

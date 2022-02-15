@@ -118,7 +118,7 @@ namespace golem
 		}
 	}
 
-	std::unique_ptr<golem::Model> Model::CreateModelFromFile(Device& device, const std::string& filepath)
+	Ref<golem::Model> Model::CreateModelFromFile(Device& device, const std::string& filepath)
 	{
 		Builder builder{};
 		builder.LoadModel("media/" + filepath);
@@ -127,15 +127,15 @@ namespace golem
 			<< "\t vertex count: " << builder.vertices.size() << "\n"
 			<< "\t index count: " << builder.indices.size() << "\n\n";
 
-		return std::make_unique<Model>(builder);
+		return CreateRef<Model>(builder);
 	}
 
-	std::unique_ptr<golem::Model> Model::CreateModelFromPrimative(Device& device, PrimitiveFunc primative, bool useIndex /*= true*/, glm::vec3 colour /*= { 1,1,1 }*/)
+	Ref<golem::Model> Model::CreateModelFromPrimative(Device& device, PrimitiveFunc primative, bool useIndex /*= true*/, glm::vec3 colour /*= { 1,1,1 }*/)
 	{
 		Builder builder{};
 		builder.LoadModel(primative, useIndex, colour);
 
-		return std::make_unique<Model>(builder);
+		return CreateRef<Model>(builder);
 	}
 
 	void Model::CreateVertexBuffers(const std::vector<Vertex>& vertices)

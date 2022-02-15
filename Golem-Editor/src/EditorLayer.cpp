@@ -2,6 +2,8 @@
 #include "glfw/include/GLFW/glfw3.h"
 #include "Golem/Time.h"
 #include "Golem/Profiling/Profiler.h"
+#include "Golem/ECS/GameObject.h"
+#include "Golem/ECS/Components/RenderComponents.h"
 
 namespace golem
 {
@@ -16,11 +18,12 @@ namespace golem
 			Application::Get().GetRenderer().GetSwapChain().extent().height,
 			m_renderPass));
 
-		CreateTempGameObjects();
-		CreateTempLights();
+		
+		CreateScene();
 		CreateUBO();
 		CreateDescriptors();
 		CreateRenderSystems();
+
 	}
 
 	EditorLayer::~EditorLayer()
@@ -35,17 +38,18 @@ namespace golem
 		// ------ update inputs ------
 		if(m_viewportFocused)
 		{
-			m_camera.controller.MoveInPlaneXZ(Time::DeltaTime(), m_camera.gObject, m_viewportCentre);
+			m_camera.GetComponent<KeyboardMovementController>().MoveInPlaneXZ(Time::DeltaTime(), m_camera, m_viewportCentre);
 		}
 
 		// ------ update camera ------
 		{
 			GOL_PROFILE_SCOPE("camera update");
-			m_camera.camera.SetViewXYZ(m_camera.gObject.transform.translation, m_camera.gObject.transform.EulerAngles());
+			auto& transform = m_camera.GetComponent<Transform>();
+			m_camera.GetComponent<Camera>().SetViewXYZ(transform.translation, transform.EulerAngles());
 
 			//float aspect = golem::Application::Get().GetRenderer().GetAspectRatio();
 			float aspect = m_viewportSize.x / m_viewportSize.y;
-			m_camera.camera.SetPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 100.0f);
+			m_camera.GetComponent<Camera>().SetPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 100.0f);
 		}
 		// ------ fill frame info struct ------
 		golem::FrameInfo fInfo
@@ -53,8 +57,8 @@ namespace golem
 			golem::Application::Get().GetRenderer().GetFrameIndex(),
 			Time::DeltaTime(),
 			commandBuffer,
-			m_camera.camera,
-			m_camera.gObject.transform.translation,
+			m_camera.GetComponent<Camera>(),
+			m_camera.GetComponent<Transform>().translation,
 			m_globalDescriptorSets[golem::Application::Get().GetRenderer().GetFrameIndex()]
 		};
 
@@ -62,10 +66,11 @@ namespace golem
 		{
 			GOL_PROFILE_SCOPE("update global uniforms");
 			golem::GlobalUBO ubo{};
-			ubo.projection = m_camera.camera.GetProjection();
-			ubo.view = m_camera.camera.GetView();
+			auto& cam = m_camera.GetComponent<Camera>();
+			ubo.projection = cam.GetProjection();
+			ubo.view = cam.GetView();
 
-			m_pointLightRenderSystem->Update(fInfo, ubo, m_gameObjects);
+			m_pointLightRenderSystem->Update(fInfo, ubo);
 
 			m_UBObuffers[fInfo.frameIndex]->WriteToBuffer(&ubo);
 			m_UBObuffers[fInfo.frameIndex]->Flush();
@@ -76,8 +81,8 @@ namespace golem
 			GOL_PROFILE_SCOPE("render scene");
 			BeginRenderPass(commandBuffer);
 
-			m_simpleRenderSystem->RenderGameObjects(fInfo, m_gameObjects);
-			m_pointLightRenderSystem->Render(fInfo, m_gameObjects);
+			m_simpleRenderSystem->RenderGameObjects(fInfo);
+			m_pointLightRenderSystem->Render(fInfo);
 
 			EndRenderPass(commandBuffer);
 		}
@@ -101,31 +106,14 @@ namespace golem
 			Application::Get().GetThreadPool().Enqueue([=] {m_pointLightRenderSystem->RuntimeCreatePipeline(); });
 		}
 
-		ImGui::Text("Viewport centre: %.f %.f", m_viewportCentre.x, m_viewportCentre.y);
-
-		static int winXPos, winYPos;
-
-		glfwGetWindowPos(static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow()), &winXPos, &winYPos);
-
-		
-		ImGui::Text("window pos: %i %i", winXPos, winYPos);
-		ImGui::Text("Mouse pos: %.f %.f", Input::GetMouseX(), Input::GetMouseY());
-		ImGui::Text("Win + Mouse pos: %.f %.f", Input::GetMouseX() + winXPos, Input::GetMouseY() + winYPos);
-
 		ImGui::Spacing();
 
 		ImGui::Text("time : %.5f", Time::DeltaTime().GetSeconds());
 		ImGui::Text("fps : %.5f", Time::FPS());
 
-		ImGui::Text("Viewport focused: %d", m_viewportFocused);
-
-		ImGui::Text("Mouse Deltas: { %.5f, %.5f }", m_camera.controller.deltax, m_camera.controller.deltay);
-
 		ImGui::Spacing();
 
-
-
-		static int count = 0;
+		static int count = -1;
 
 		ImGui::InputInt("Frame recording count", &count);
 
@@ -139,7 +127,6 @@ namespace golem
 			}
 			
 		}
-			
 
 		const char* buttonText = (Profiler::IsRecording())? "End Recording" : "Begin Recording";
 
@@ -233,37 +220,37 @@ namespace golem
 		SAFE_RUN_VULKAN_FUNC(vkCreateRenderPass(Application::Get().GetDevice().device(), &renderPassCreateInfo, nullptr, &m_renderPass), "");
 	}
 
-	void EditorLayer::CreateTempGameObjects()
+	void EditorLayer::CreateScene()
 	{
-		m_camera.gObject.transform.translation = { 0.0f,0.0f,-5 };
-		m_camera.controller.moveSpeed = 5;
-
 		auto& device = golem::Application::Get().GetDevice();
 
-		Ref<Model> cubeModel = Model::CreateModelFromPrimative(device, Primitives::Cube, false);
-		auto cube = TempGameObject::Create();
-		cube.model = cubeModel;
-		cube.transform.translation = { 1.5f,0.f,0 };
-		m_gameObjects.push_back(std::move(cube));
+		Application::Get().SetScene(new Scene());
 
+		m_camera = GameObject::Create("Camera");
+		m_camera.AddComponent<Camera>();
+		m_camera.AddComponent<KeyboardMovementController>().moveSpeed = 5;
+		m_camera.GetComponent<Transform>().translation = { 0.0f,0.0f,-5 };
 
-		Ref<Model> quadModel = Model::CreateModelFromPrimative(device, Primitives::Quad);
-		auto quad = TempGameObject::Create();
-		quad.model = quadModel;
-		quad.transform.translation = { 0,0.75f,0 };
-		quad.transform.scale = { 7,1,7 };
-		m_gameObjects.push_back(std::move(quad));
+		auto gObj = GameObject::Create("Cube");
+		gObj.AddComponent<MeshRendererComponent>(Model::CreateModelFromPrimative(device, Primitives::Cube, false));
+		gObj.GetComponent<Transform>().translation = { 1.5f,0.f,0 };
 
-		Ref<Model> vaseModel = Model::CreateModelFromFile(device, "models/smooth_vase.obj");
-		auto vase = TempGameObject::Create();
-		vase.model = vaseModel;
-		vase.transform.translation = { -1.5f,0.5f,0 };
-		vase.transform.scale = { 5,5,5 };
-		m_gameObjects.push_back(std::move(vase));
-	}
+		gObj = GameObject::Create("Floor");
+		gObj.AddComponent<MeshRendererComponent>(Model::CreateModelFromPrimative(device, Primitives::Quad));
+		{
+			auto& t = gObj.GetComponent<Transform>();
+			t.translation = { 0,0.75f,0 };
+			t.scale = { 7,1,7 };
+		}
+		
+		gObj = GameObject::Create("Vase");
+		gObj.AddComponent<MeshRendererComponent>(Model::CreateModelFromFile(device, "models/smooth_vase.obj"));
+		{
+			auto& t = gObj.GetComponent<Transform>();
+			t.translation = { -1.5f,0.5f,0 };
+			t.scale = { 5,5,5 };
+		}
 
-	void EditorLayer::CreateTempLights()
-	{
 		std::vector<glm::vec3> lightColors{
 			{1.f, .1f, .1f},
 			{.1f, .1f, 1.f},
@@ -275,14 +262,13 @@ namespace golem
 
 		for (int i = 0; i < lightColors.size(); i++)
 		{
-			auto pLight = TempGameObject::CreatePointLight(1.0f, 0.05f, lightColors[i]);
-
+			gObj = GameObject::Create("Point Light" + i);
+			gObj.AddComponent<PointLightComponent>(1.0f, lightColors[i]);
 			auto rotateLight = glm::rotate(glm::mat4(1.0f), (i * glm::two_pi<float>()) / lightColors.size(), { 0,-1,0 });
-
-			pLight.transform.translation = 1.5f * glm::vec3(rotateLight * glm::vec4(-1, -0.5, -1, 1));
-
-			m_gameObjects.push_back(std::move(pLight));
+			gObj.GetComponent<Transform>().translation = 1.5f * glm::vec3(rotateLight * glm::vec4(-1, -0.5, -1, 1));
+			gObj.GetComponent<Transform>().scale.x = 0.05f;
 		}
+
 	}
 
 	void EditorLayer::CreateUBO()

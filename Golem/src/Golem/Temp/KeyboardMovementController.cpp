@@ -12,9 +12,11 @@
 namespace golem
 {
 
-	void KeyboardMovementController::MoveInPlaneXZ(float dt, TempGameObject& gameObject, glm::vec2 viewCentre)
+	void KeyboardMovementController::MoveInPlaneXZ(float dt, GameObject gameObject, glm::vec2 viewCentre)
 	{
 		GOL_PROFILE_FUNCTION();
+
+		auto& transform = gameObject.GetComponent<Transform>();
 
 		glm::vec3 rotate{ 0.0f };
 
@@ -57,19 +59,19 @@ namespace golem
 		
 			if (VecIsZero(rotate))
 			{
-				glm::vec3 rot = gameObject.transform.EulerAngles() + turnSpeed * dt * glm::normalize(rotate);
-				gameObject.transform.Rotation(rot);
+				glm::vec3 rot = transform.EulerAngles() + turnSpeed * dt * glm::normalize(rotate);
+				transform.Rotation(rot);
 			}
 			
 		
-			gameObject.transform.RotationX(glm::clamp(gameObject.transform.EulerAngles().x, -1.5f, 1.5f));
-			gameObject.transform.RotationY(glm::mod(gameObject.transform.EulerAngles().y, glm::two_pi<float>()));
+			transform.RotationX(glm::clamp(transform.EulerAngles().x, -1.5f, 1.5f));
+			transform.RotationY(glm::mod(transform.EulerAngles().y, glm::two_pi<float>()));
 
 		}
 
 		GOL_PROFILE_SCOPE("KeyboardMovementController::MoveInPlaneXZ -> translation");
 
-		float yaw = gameObject.transform.EulerAngles().y;
+		float yaw = transform.EulerAngles().y;
 		const glm::vec3 forwardDir{ sin(yaw), 0.0f, cos(yaw) };
 		const glm::vec3 rightDir{ forwardDir.z, 0.0f, -forwardDir.x };
 		const glm::vec3 upDir{ 0.0f, -1.0f, 0.0f };
@@ -90,10 +92,10 @@ namespace golem
 			moveDir -= upDir;
 
 		if (VecIsZero(moveDir))
-			gameObject.transform.translation += moveSpeed * dt * glm::normalize(moveDir);
+			transform.translation += moveSpeed * dt * glm::normalize(moveDir);
 	}
 
-	void KeyboardMovementController::MoveInPlaneXY(float dt, TempGameObject& gameObject)
+	void KeyboardMovementController::MoveInPlaneXY(float dt, GameObject gameObject)
 	{
 		const glm::vec3 forwardDir{ 0, 0.0f, 1 };
 		const glm::vec3 rightDir{ forwardDir.z, 0.0f, -forwardDir.x };
@@ -117,50 +119,7 @@ namespace golem
 		int window_border = 20;
 
 		if (VecIsZero(moveDir))
-			gameObject.transform.translation += moveSpeed * dt * glm::normalize(moveDir);
-	}
-
-	void KeyboardMovementController::DrawGui(TempGameObject& gameObject)
-	{
-		if (ImGui::CollapsingHeader("Camera Options"))
-		{
-			ImGui::Indent(10);
-
-			static bool showControls = false;
-			ImGui::Checkbox("show Controls##bool", &showControls);
-			if (showControls)
-			{
-				if (two_D)
-				{
-					ImGui::Text("Camera Controls:");
-					ImGui::Text("\tWASD to move.");
-					ImGui::Text("\tHold mouse to edge of window to pan");
-					ImGui::Text("\tE to zoom out");
-					ImGui::Text("\tQ to zoom in");
-				}
-				else
-				{
-					ImGui::Text("Camera Controls:");
-					ImGui::Text("\tWASD to move.");
-					ImGui::Text("\tRight click and drag to turn");
-					ImGui::Text("\tSpace to ascend");
-					ImGui::Text("\tQ to descend");
-				}
-			}
-
-			if (ImGui::Checkbox("2d camera controls##bool", &two_D))
-			{
-				if (two_D == true)
-				{
-					gameObject.transform.Rotation( 0,0,0 );
-				}
-			}
-			ImGui::Text(("Position: (" + std::to_string(gameObject.transform.translation.x) + ", " + std::to_string(gameObject.transform.translation.y) + ", " + std::to_string(gameObject.transform.translation.z) + ")").c_str());
-			ImGui::Text(("rotation: (" + std::to_string(gameObject.transform.rotation.x) + ", " + std::to_string(gameObject.transform.rotation.y) + ", " + std::to_string(gameObject.transform.rotation.z) + ")").c_str());
-			ImGui::SliderFloat("Camera move speed", &moveSpeed, 0.1f, 10.0f);
-			ImGui::SliderFloat("Camera rotation speed", &turnSpeed, 1.0f, 20.0f);
-			ImGui::Indent(-10);
-		}
+			gameObject.GetComponent<Transform>().translation += moveSpeed * dt * glm::normalize(moveDir);
 	}
 
 }

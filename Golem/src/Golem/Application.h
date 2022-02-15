@@ -11,6 +11,7 @@
 #include "ThreadPool.h"
 
 #include "Render/RenderTexture.h"
+#include "ECS/Scene.h"
 
 
 namespace golem
@@ -27,9 +28,8 @@ namespace golem
 		// Temp stuff ---------------------------------------------------------
 		Scope<TextureManager> m_textureManager;
 
-		double m_deltaTime = 0;
-
 		// --------------------------------------------------------------------
+		Ref<Scene> m_activeScene;
 
 		ImGuiLayer* m_guiLayer;
 
@@ -53,9 +53,14 @@ namespace golem
 		inline Device& GetDevice() { return *m_device;}
 		inline Renderer& GetRenderer() { return *m_renderer;}
 		inline TextureManager& GetTextureManager() { return *m_textureManager;}
+		
+
+		// TODO : move this into a "Scene Manager"
+		inline Ref<Scene> GetScene() {return Ref<Scene>(m_activeScene);}
+		inline void SetScene(Scene* scene) {m_activeScene = Ref<Scene>(scene);}
+
 
 		static void FireEvent(Event* e);
-		static double DeltaTime() {return s_instance->m_deltaTime;}
 
 		void Run();
 

@@ -1,7 +1,8 @@
 #pragma once
 #include "RenderSystemBase.h"
 #include "../FrameInfo.h"
-#include "Golem/Temp/TempGameObject.h"
+#include "Golem/ECS/Scene.h"
+#include "Golem/ECS/GameObject.h"
 
 namespace golem
 {
@@ -11,6 +12,8 @@ namespace golem
 	public:
 		
 	private:
+		System m_renderSystem;
+		System m_updateSystem;
 
 		// Methods ********************************************************************************
 	public:
@@ -23,8 +26,8 @@ namespace golem
 
 		REMOVE_COPY_CONSTRUCTOR(PointLightRenderSystem);
 
-		void Update(FrameInfo& fInfo, GlobalUBO& ubo, std::vector<TempGameObject>& gameObjects);
-		void Render(FrameInfo& fInfo, std::vector<TempGameObject>& gameObjects);
+		void Update(FrameInfo& fInfo, GlobalUBO& ubo);
+		void Render(FrameInfo& fInfo);
 	protected:
 		
 		virtual void CreatePipelineLayout(
@@ -32,5 +35,8 @@ namespace golem
 			uint32_t pushConstantSize,
 			VkShaderStageFlags pushConstantShaderStages = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT
 			);
+
+		void RenderGameObject(GameObject gObj, FrameInfo& fInfo);
+		void UpdateGameObject(GameObject gObj, FrameInfo& fInfo);
 	};
 }

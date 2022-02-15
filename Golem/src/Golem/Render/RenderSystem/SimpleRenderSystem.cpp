@@ -1,5 +1,8 @@
 #include "golpch.h"
 #include "SimpleRenderSystem.h"
+#include "Golem/Application.h"
+#include "Golem/ECS/Components/RenderComponents.h"
+#include "Golem/ECS/GameObject.h"
 
 namespace golem
 {
@@ -10,7 +13,7 @@ namespace golem
 	};
 
 	SimpleRenderSystem::SimpleRenderSystem(Device& _device, VkDescriptorSetLayout descriptorSet)
-		: RenderSystemBase(_device)
+		: RenderSystemBase(_device), m_renderSystem([=](GameObject go, FrameInfo& info) {RenderGameObject(go, info);})
 	{
 		CreatePipelineLayout(descriptorSet, sizeof(SimplePushConstantData), VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT);
 
@@ -20,9 +23,11 @@ namespace golem
 		Pipeline::DefaultPipelineConfigInfo(m_configInfo);
 
 		CreatePipeline();
+
+
 	}
 
-	void SimpleRenderSystem::RenderGameObjects(FrameInfo& fInfo, std::vector<TempGameObject>& gameObjects)
+	void SimpleRenderSystem::RenderGameObjects(FrameInfo& fInfo)
 	{
 		m_pipeline->Bind(fInfo.commandBuffer);
 
@@ -35,41 +40,7 @@ namespace golem
 			0, nullptr
 		);
 
-		for (auto& obj : gameObjects)
-		{
-			
-			if(obj.model == nullptr)
-				continue;
-			
-			/*auto rot = obj.transform.GetRot();
-
-			obj.transform2.Rotation(
-				glm::mod(glm::radians(rot.x) + (1.0f * fInfo.frameTime), glm::two_pi<float>()),
-				glm::mod(glm::radians(rot.y) + (1.f * fInfo.frameTime), glm::two_pi<float>()),
-				0,
-				false
-			);*/
-
-			SimplePushConstantData pushData{};
-
-			//pushData.modelMatrix = obj.transform.positionRotMat() * obj.transform.scaleMat();
-			//pushData.normalMatrix = obj.transform.normalMatrix();
-			
-			pushData.modelMatrix = obj.transform;
-			pushData.normalMatrix = obj.transform.NormalMatrix();
-
-			vkCmdPushConstants(
-				fInfo.commandBuffer,
-				m_pipelineLayout,
-				VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT,
-				0,
-				sizeof(SimplePushConstantData),
-				&pushData
-			);
-
-			obj.model->Bind(fInfo.commandBuffer);
-			obj.model->Draw(fInfo.commandBuffer);
-		}
+		m_renderSystem.Run<MeshRendererComponent>(Application::Get().GetScene(), fInfo);
 	}
 
 	void SimpleRenderSystem::CreatePipelineLayout(
@@ -92,6 +63,32 @@ namespace golem
 		pipelineCreateInfo.pPushConstantRanges = &pushConstantRange;
 
 		SAFE_RUN_VULKAN_FUNC(vkCreatePipelineLayout(m_device, &pipelineCreateInfo, nullptr, &m_pipelineLayout), "failed to create pipelineLayout");
+	}
+
+	void SimpleRenderSystem::RenderGameObject(GameObject gObj, FrameInfo& fInfo)
+	{
+		SimplePushConstantData pushData{};
+
+		auto& transform = gObj.GetComponent<Transform>();
+		auto& meshRenderer = gObj.GetComponent<MeshRendererComponent>();
+
+		//pushData.modelMatrix = obj.transform.positionRotMat() * obj.transform.scaleMat();
+		//pushData.normalMatrix = obj.transform.normalMatrix();
+
+		pushData.modelMatrix = transform;
+		pushData.normalMatrix = transform.NormalMatrix();
+
+		vkCmdPushConstants(
+			fInfo.commandBuffer,
+			m_pipelineLayout,
+			VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT,
+			0,
+			sizeof(SimplePushConstantData),
+			&pushData
+		);
+
+		meshRenderer.model->Bind(fInfo.commandBuffer);
+		meshRenderer.model->Draw(fInfo.commandBuffer);
 	}
 
 }

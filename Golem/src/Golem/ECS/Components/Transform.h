@@ -1,6 +1,6 @@
 #pragma once
 #include "Component.h"
-#include "../DataStructures/TreeNode.h"
+#include "Golem/DataStructures/TreeNode.h"
 
 
 namespace golem
@@ -21,6 +21,7 @@ namespace golem
 		// Methods ********************************************************************************
 	public:
 		Transform();
+		Transform(const Transform&) = default;
 		Transform(const glm::vec3& pos, const glm::quat& rot = glm::quat(1.0f,0.0f,0.0f,0.0f), const glm::vec3& scale = glm::vec3(1.0f));
 
 		void Rotation(const float x, const float y, const float z, bool degrees = true);

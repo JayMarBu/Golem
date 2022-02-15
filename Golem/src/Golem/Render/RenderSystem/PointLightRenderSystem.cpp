@@ -1,5 +1,6 @@
 #include "golpch.h"
 #include "PointLightRenderSystem.h"
+#include "Golem/ECS/Components/RenderComponents.h"
 
 namespace golem
 {
@@ -11,7 +12,9 @@ namespace golem
 	};
 
 	PointLightRenderSystem::PointLightRenderSystem(Device& _device, VkDescriptorSetLayout descriptorSet)
-		: RenderSystemBase(_device)
+		: RenderSystemBase(_device),
+		m_renderSystem([=](GameObject go, FrameInfo& info) {RenderGameObject(go,info);}),
+		m_updateSystem([=](GameObject go, FrameInfo& info) {RenderGameObject(go,info);})
 	{
 		CreatePipelineLayout(descriptorSet, sizeof(PointLightPushConstant));
 
@@ -26,23 +29,27 @@ namespace golem
 		CreatePipeline();
 	}
 
-	void PointLightRenderSystem::Update(FrameInfo& fInfo, GlobalUBO& ubo, std::vector<TempGameObject>& gameObjects)
+	void PointLightRenderSystem::Update(FrameInfo& fInfo, GlobalUBO& ubo)
 	{
 		int lightIndex = 0;
-		for (int i = 0; i < gameObjects.size(); i++)
+		
+		System system([&ubo, &lightIndex](GameObject gObj, FrameInfo& fInfo)
 		{
-			if(gameObjects[i].pointLight == nullptr)
-				continue;
+			auto& transform = gObj.GetComponent<Transform>();
+			auto& pointLight = gObj.GetComponent<PointLightComponent>();
 
-			ubo.pointLights[lightIndex].pos = glm::vec4(gameObjects[i].transform.translation, 1.0f);
-			ubo.pointLights[lightIndex].lightColour = glm::vec4(gameObjects[i].colour, gameObjects[i].pointLight->lightIntensity);
+			ubo.pointLights[lightIndex].pos = glm::vec4(transform.translation, 1.0f);
+			ubo.pointLights[lightIndex].lightColour = glm::vec4(pointLight.colour, pointLight.intensity);
 
-			lightIndex++;
-		}
+			lightIndex++;	
+		});
+
+		system.Run<PointLightComponent>(Application::Get().GetScene(), fInfo);
+
 		ubo.numLights = lightIndex;
 	}
 
-	void PointLightRenderSystem::Render(FrameInfo& fInfo, std::vector<TempGameObject>& gameObjects)
+	void PointLightRenderSystem::Render(FrameInfo& fInfo)
 	{
 		m_pipeline->Bind(fInfo.commandBuffer);
 
@@ -55,30 +62,7 @@ namespace golem
 			0, nullptr
 		);
 
-		int lightIndex = 0;
-		for (int i = 0; i < gameObjects.size(); i++)
-		{
-			if (gameObjects[i].pointLight == nullptr)
-				continue;
-			
-			PointLightPushConstant pushData{};
-
-			pushData.pos = glm::vec4(gameObjects[i].transform.translation,1.0f);
-			pushData.colour = glm::vec4(gameObjects[i].colour, 1.0f);
-			pushData.radius = gameObjects[i].transform.scale.x;
-
-			vkCmdPushConstants(
-				fInfo.commandBuffer,
-				m_pipelineLayout,
-				VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT,
-				0,
-				sizeof(PointLightPushConstant),
-				&pushData
-			);
-
-			vkCmdDraw(fInfo.commandBuffer, 6, 1, 0, 0);
-			lightIndex++;
-		}
+		m_renderSystem.Run<PointLightComponent>(Application::Get().GetScene(),fInfo);
 	}
 
 	void PointLightRenderSystem::CreatePipelineLayout(VkDescriptorSetLayout descriptorSet, uint32_t pushConstantSize, VkShaderStageFlags pushConstantShaderStages /*= VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT */)
@@ -98,6 +82,34 @@ namespace golem
 		pipelineCreateInfo.pPushConstantRanges = &pushConstantRange;
 
 		SAFE_RUN_VULKAN_FUNC(vkCreatePipelineLayout(m_device, &pipelineCreateInfo, nullptr, &m_pipelineLayout), "failed to create pipelineLayout");
+	}
+
+	void PointLightRenderSystem::RenderGameObject(GameObject gObj, FrameInfo& fInfo)
+	{
+		PointLightPushConstant pushData{};
+
+		auto& transform = gObj.GetComponent<Transform>();
+		auto& pointLight = gObj.GetComponent<PointLightComponent>();
+
+		pushData.pos = glm::vec4(transform.translation, 1.0f);
+		pushData.colour = glm::vec4(pointLight.colour, 1.0f);
+		pushData.radius = transform.scale.x;
+
+		vkCmdPushConstants(
+			fInfo.commandBuffer,
+			m_pipelineLayout,
+			VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT,
+			0,
+			sizeof(PointLightPushConstant),
+			&pushData
+		);
+
+		vkCmdDraw(fInfo.commandBuffer, 6, 1, 0, 0);
+	}
+
+	void PointLightRenderSystem::UpdateGameObject(GameObject gObj, FrameInfo& fInfo)
+	{
+
 	}
 
 }

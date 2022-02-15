@@ -1,7 +1,7 @@
 #pragma once
 #include "Golem/Input/KeyCodes.h"
-#include "TempGameObject.h"
 #include "../Window.h"
+#include "../ECS/GameObject.h"
 
 namespace golem
 {
@@ -38,9 +38,7 @@ namespace golem
 
 	public:
 
-		void MoveInPlaneXZ(float dt, TempGameObject& gameObject, glm::vec2 viewCentre);
-		void MoveInPlaneXY(float dt, TempGameObject& gameObject);
-
-		void DrawGui(TempGameObject& gameObject);
+		void MoveInPlaneXZ(float dt, GameObject gameObject, glm::vec2 viewCentre);
+		void MoveInPlaneXY(float dt, GameObject gameObject);
 	};
 }
