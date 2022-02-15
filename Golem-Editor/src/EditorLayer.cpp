@@ -115,6 +115,7 @@ namespace golem
 		ImGui::Spacing();
 
 		ImGui::Text("time : %.5f", Time::DeltaTime().GetSeconds());
+		ImGui::Text("fps : %.5f", Time::FPS());
 
 		ImGui::Text("Viewport focused: %d", m_viewportFocused);
 

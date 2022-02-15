@@ -54,6 +54,10 @@ namespace golem
 
 			Time::Frame();
 
+			/* TODO : command buffer shouldn't be recorded every frame like this, ESPECIALLY
+			*	on mailbox present mode. It should be limited to refresh rate, or ideally even less
+			*	than that.
+			*/
 			auto commandBuffer = m_renderer->BeginFrame();
 			if (!commandBuffer)
 				continue;

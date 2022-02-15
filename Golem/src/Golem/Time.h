@@ -11,6 +11,7 @@ namespace golem
 		static void Frame();
 
 		static TimeStep DeltaTime();
+		static float FPS();
 	};
 
 	class TimeStep

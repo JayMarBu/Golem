@@ -39,7 +39,7 @@ namespace golem
 		VkCommandBufferBeginInfo beginInfo{};
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-		SAFE_RUN_VULKAN_FUNC(vkBeginCommandBuffer(commandBuffer, &beginInfo), "failed to being recording command buffer");
+		SAFE_RUN_VULKAN_FUNC(vkBeginCommandBuffer(commandBuffer, &beginInfo), "failed to begin recording command buffer");
 
 		return commandBuffer;
 	}
