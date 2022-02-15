@@ -19,6 +19,7 @@ namespace golem
 
 	VkCommandBuffer Renderer::BeginFrame()
 	{
+		GOL_PROFILE_FUNCTION();
 		GOL_CORE_ASSERT(!m_isFrameStarted, "Another frame is already in progress, EndFrame() has not yet been called for the previous frame");
 
 		auto result = m_swapChain->AcquireNextImage(&m_currentImageIndex);
