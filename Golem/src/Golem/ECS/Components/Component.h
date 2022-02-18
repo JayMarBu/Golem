@@ -1,5 +1,6 @@
 #pragma once
 #include "entt.hpp"
+#include "Golem/Reflection/Reflection.h"
 
 namespace golem
 {
@@ -12,5 +13,7 @@ namespace golem
 		// Methods ********************************************************************************
 	protected:
 		Component() = default;
+	public:
+		REFLECT()
 	};
 }

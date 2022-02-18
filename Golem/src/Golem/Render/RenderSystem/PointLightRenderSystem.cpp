@@ -1,6 +1,7 @@
 #include "golpch.h"
 #include "PointLightRenderSystem.h"
 #include "Golem/ECS/Components/RenderComponents.h"
+#include "Golem/ECS/Components/Transform.h"
 
 namespace golem
 {

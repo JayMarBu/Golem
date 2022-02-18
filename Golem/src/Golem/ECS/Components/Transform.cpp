@@ -2,12 +2,14 @@
 #include "Transform.h"
 #include <glm/gtx/quaternion.hpp>
 #include "glm/gtc/matrix_inverse.hpp"
+#include "../GameObject.h"
 
 namespace golem
 {
 	REFLECT_STRUCT_BEGIN(Transform)
 	REFLECT_STRUCT_END()
 
+	IMPLEMENT_COMPONENT_EDITOR(Transform, TransformComponentEditor)
 
 	Transform::Transform()
 		:translation{0.0f}, rotation{1.0f,0.0f,0.0f,0.0f}, scale{1.0f}, rotVec{0.0f}
@@ -163,6 +165,67 @@ namespace golem
 		glm::mat3 normalMat = glm::inverseTranspose(modelMat);
 
 		return normalMat;
+	}
+
+	void TransformComponentEditor::Draw(class GameObject obj)
+	{
+		auto& component = obj.GetComponent<Transform>();
+
+		ImGui::TableSetColumnIndex(0);
+		ImGui::SetNextItemWidth(ImGui::GetColumnWidth());
+		ImGui::Text("position");
+
+		ImGui::TableSetColumnIndex(1);
+		ImGui::SetNextItemWidth(ImGui::GetColumnWidth());
+		float pos[3] =
+		{
+		component.translation.x,
+		component.translation.y,
+		component.translation.z
+		};
+		if (ImGui::DragFloat3("##position", pos, 0.1f))
+		{
+			bool locked = false;
+			component.translation = {pos[0], pos[1], pos[2]};
+		}
+
+		ImGui::TableNextRow();
+
+		ImGui::TableSetColumnIndex(0);
+		ImGui::SetNextItemWidth(ImGui::GetColumnWidth());
+		ImGui::Text("rotation");
+
+		ImGui::TableSetColumnIndex(1);
+		ImGui::SetNextItemWidth(ImGui::GetColumnWidth());
+		float rot[3] =
+		{
+		component.rotVec.x,
+		component.rotVec.y,
+		component.rotVec.z
+		};
+		if (ImGui::DragFloat3("##rotation", rot, 0.1f))
+		{
+			component.Rotation(rot[0], rot[1], rot[2]);
+		}
+
+		ImGui::TableNextRow();
+
+		ImGui::TableSetColumnIndex(0);
+		ImGui::SetNextItemWidth(ImGui::GetColumnWidth());
+		ImGui::Text("scale");
+
+		ImGui::TableSetColumnIndex(1);
+		ImGui::SetNextItemWidth(ImGui::GetColumnWidth());
+		float scale[3] =
+		{
+		component.scale.x,
+		component.scale.y,
+		component.scale.z
+		};
+		if (ImGui::DragFloat3("##scale", scale, 0.1f))
+		{
+			component.scale = {scale[0], scale[1], scale[2]};
+		}
 	}
 
 }

@@ -4,6 +4,8 @@
 
 namespace golem
 {
+	REFLECT_STRUCT_BEGIN(Camera)
+	REFLECT_STRUCT_END()
 
 	void Camera::SetViewDirection(glm::vec3 position, glm::vec3 direction, glm::vec3 up /*= glm::vec3(0.f, -1.0f, 0.f)*/)
 	{

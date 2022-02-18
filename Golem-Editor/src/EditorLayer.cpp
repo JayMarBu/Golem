@@ -4,6 +4,7 @@
 #include "Golem/Profiling/Profiler.h"
 #include "Golem/ECS/GameObject.h"
 #include "Golem/ECS/Components/RenderComponents.h"
+#include "Golem/ECS/Components/Transform.h"
 
 namespace golem
 {

@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "GameObject.h"
 #include "Components/TagComponent.h"
+#include "Components/Transform.h"
 #include "Editor/GameObjectHierarchyEditor.h"
 
 namespace golem

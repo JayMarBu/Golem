@@ -1,11 +1,19 @@
 #pragma once
 #include "Component.h"
 #include "Golem/DataStructures/TreeNode.h"
-#include "Golem/Reflection/Reflection.h"
+#include "Editor/ComponentEditor.h"
 
 
 namespace golem
 {
+	class TransformComponentEditor : public ComponentEditor
+	{
+	public:
+		TransformComponentEditor(const char* name) : ComponentEditor(name){}
+
+		virtual void Draw(class GameObject gObj) override;
+	};
+
 	class Transform : public Component, public TreeNode<Transform>
 	{
 		// Members ********************************************************************************
@@ -40,6 +48,7 @@ namespace golem
 
 		glm::mat3 NormalMatrix();
 
+		COMPONENT_EDITOR(TransformComponentEditor)
 		REFLECT()
 	};
 }

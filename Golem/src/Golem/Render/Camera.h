@@ -1,8 +1,9 @@
 #pragma once
+#include "../ECS/Components/Component.h"
 
 namespace golem
 {
-	class Camera
+	class Camera : public Component
 	{
 		// Members ********************************************************************************
 	public:
@@ -39,5 +40,7 @@ namespace golem
 
 		const glm::mat4& GetProjection() const { return m_projectionMatrix; }
 		const glm::mat4& GetView() const { return m_viewMatrix; }
+
+		REFLECT()
 	};
 }

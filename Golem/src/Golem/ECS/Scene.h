@@ -1,5 +1,4 @@
 #pragma once
-#include "Components/Transform.h"
 #include "entt.hpp"
 #include "../Render/FrameInfo.h"
 
@@ -17,8 +16,6 @@ namespace golem
 
 	private:
 		entt::registry m_registry;
-
-		Transform m_transform;
 
 		static Scene* g_workSpace;
 

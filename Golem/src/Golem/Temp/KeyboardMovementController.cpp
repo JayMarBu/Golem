@@ -8,6 +8,7 @@
 #include "imgui.h"
 #include "../Application.h"
 #include "GLFW/glfw3.h"
+#include "../ECS/Components/Transform.h"
 
 namespace golem
 {

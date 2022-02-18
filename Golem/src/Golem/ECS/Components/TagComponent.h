@@ -1,7 +1,6 @@
 #pragma once
 #include "Component.h"
 #include "Editor/ComponentEditor.h"
-#include "Golem/Reflection/Reflection.h"
 
 namespace golem
 {

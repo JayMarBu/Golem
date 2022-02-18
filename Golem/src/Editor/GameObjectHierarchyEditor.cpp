@@ -3,6 +3,8 @@
 
 #include "imgui.h"
 #include "Golem/ECS/Components/TagComponent.h"
+#include "Golem/ECS/Components/RenderComponents.h"
+#include "Golem/ECS/Components/Transform.h"
 
 namespace golem
 {
@@ -100,6 +102,9 @@ namespace golem
 	{
 		DRAW_COMPONENT(TagComponent)
 		DRAW_COMPONENT(Transform)
+		DRAW_COMPONENT(Camera)
+		DRAW_COMPONENT(MeshRendererComponent)
+		DRAW_COMPONENT(PointLightComponent)
 	}
 
 }

@@ -19,6 +19,8 @@ namespace golem
 			: model{m}{}
 		MeshRendererComponent(const MeshRendererComponent& other)
 			: model{other.model} {}
+
+		REFLECT()
 	};
 
 	struct PointLightComponent : public Component
@@ -29,5 +31,7 @@ namespace golem
 		PointLightComponent() = default;
 		PointLightComponent(float i, glm::vec3 c)
 			: intensity{i}, colour{c}{}
+
+		REFLECT()
 	};
 }

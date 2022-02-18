@@ -123,7 +123,8 @@ project "Golem-Editor"
 		"Golem/src",
 		"Golem/external",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.imgui}"
 	}
 
 	links
@@ -189,7 +190,8 @@ project "Sandbox"
 		"Golem/src",
 		"Golem/external",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.imgui}"
 	}
 
 	links
