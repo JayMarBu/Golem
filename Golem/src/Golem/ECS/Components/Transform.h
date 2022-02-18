@@ -1,6 +1,7 @@
 #pragma once
 #include "Component.h"
 #include "Golem/DataStructures/TreeNode.h"
+#include "Golem/Reflection/Reflection.h"
 
 
 namespace golem
@@ -38,5 +39,7 @@ namespace golem
 		operator glm::mat4() {return Mat4();}
 
 		glm::mat3 NormalMatrix();
+
+		REFLECT()
 	};
 }

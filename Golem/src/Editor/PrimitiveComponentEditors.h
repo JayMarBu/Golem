@@ -1,16 +1,17 @@
 #pragma once
-#include "entt.hpp"
 
 namespace golem
 {
-	struct Component
+	class PrimitiveComponentEditors
 	{
 		// Members ********************************************************************************
 	public:
-		entt::entity gObj;
+		
+	private:
 
 		// Methods ********************************************************************************
-	protected:
-		Component() = default;
+	public:
+
+	private:
 	};
 }

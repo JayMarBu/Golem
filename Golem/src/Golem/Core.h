@@ -14,7 +14,8 @@
 
 #define BIT(n) (1 << n)
 
-#define BIND_EVENT_FUNC(func) std::bind(&func, this, std::placeholders::_1)
+#define BIND_EVENT_FUNC(func) [this](auto&&... args) -> decltype(auto) {return this->func(std::forward<decltype(args)>(args)...); }
+// std::bind(&func, this, std::placeholders::_1)
 
 #define CLEANUP(x) if(x != NULL) { delete x; x = NULL;}
 

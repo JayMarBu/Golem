@@ -5,6 +5,9 @@
 
 namespace golem
 {
+	REFLECT_STRUCT_BEGIN(Transform)
+	REFLECT_STRUCT_END()
+
 
 	Transform::Transform()
 		:translation{0.0f}, rotation{1.0f,0.0f,0.0f,0.0f}, scale{1.0f}, rotVec{0.0f}

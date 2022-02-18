@@ -1,6 +1,8 @@
 #include "golpch.h"
 #include "Scene.h"
 #include "GameObject.h"
+#include "Components/TagComponent.h"
+#include "Editor/GameObjectHierarchyEditor.h"
 
 namespace golem
 {

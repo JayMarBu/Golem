@@ -12,6 +12,7 @@
 #include "Golem/Render/RenderSystem/InfiniGridRenderSystem.h"
 
 #include "Golem/Events/RenderSystemEvents.h"
+#include "Editor/GameObjectHierarchyEditor.h"
 
 namespace golem
 {
@@ -42,6 +43,8 @@ namespace golem
 
 		VkRenderPass m_renderPass;
 		Ref<RenderTexture> m_renderTexture;
+
+		GameObjectHierarchyEditor m_gameObjectHierarchyEditor;
 
 		// Methods ********************************************************************************
 	public:

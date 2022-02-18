@@ -24,6 +24,7 @@ namespace golem
 		CreateDescriptors();
 		CreateRenderSystems();
 
+		m_gameObjectHierarchyEditor.SetScene(Application::Get().GetScene());
 	}
 
 	EditorLayer::~EditorLayer()
@@ -90,6 +91,8 @@ namespace golem
 
 	void EditorLayer::OnImGuiRender()
 	{
+		GOL_PROFILE_FUNCTION();
+
 		BeginDocking();
 
 		DrawSceneViewport();
@@ -139,6 +142,8 @@ namespace golem
 		}
 
 		ImGui::End();
+
+		m_gameObjectHierarchyEditor.Draw();
 
 		EndDocking();
 	}

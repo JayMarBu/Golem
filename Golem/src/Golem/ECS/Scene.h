@@ -36,6 +36,7 @@ namespace golem
 
 		friend class GameObject;
 		friend class System;
+		friend class GameObjectHierarchyEditor;
 	};
 
 	class System
