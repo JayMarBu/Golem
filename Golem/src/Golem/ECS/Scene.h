@@ -16,8 +16,6 @@ namespace golem
 
 	private:
 		entt::registry m_registry;
-		
-		Scope<GameObject> m_rootObj;
 
 		// Methods ********************************************************************************
 	private:
@@ -25,8 +23,6 @@ namespace golem
 	public:
 		Scene();
 		~Scene();
-
-		void Init();
 
 		void OnUpdate();
 		

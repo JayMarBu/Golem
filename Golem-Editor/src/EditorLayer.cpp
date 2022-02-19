@@ -233,8 +233,6 @@ namespace golem
 		Application::Get().SetScene(new Scene());
 		m_gameObjectHierarchyEditor.SetScene(Application::Get().GetScene());
 
-		Application::Get().GetScene()->Init();
-
 		m_camera = GameObject::Create("Camera");
 		m_camera.AddComponent<Camera>();
 		m_camera.AddComponent<KeyboardMovementController>().moveSpeed = 5;
@@ -271,7 +269,7 @@ namespace golem
 
 		for (int i = 0; i < lightColors.size(); i++)
 		{
-			gObj = GameObject::Create("Point Light" + i);
+			gObj = GameObject::Create(("Point Light " + std::to_string(i)).c_str());
 			gObj.AddComponent<PointLightComponent>(1.0f, lightColors[i]);
 			auto rotateLight = glm::rotate(glm::mat4(1.0f), (i * glm::two_pi<float>()) / lightColors.size(), { 0,-1,0 });
 			gObj.GetComponent<Transform>().translation = 1.5f * glm::vec3(rotateLight * glm::vec4(-1, -0.5, -1, 1));

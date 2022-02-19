@@ -21,7 +21,7 @@ namespace golem
 
 		void DrawHierarchyViewport();
 
-		void DrawGameObject(GameObject obj, bool isRoot = true);
+		void DrawGameObject(GameObject obj);
 
 		void DrawComponentsViewport();
 

@@ -16,12 +16,6 @@ namespace golem
 		m_registry.clear();
 	}
 
-	void Scene::Init()
-	{
-		m_rootObj.reset(new GameObject(m_registry.create()));
-		m_rootObj->AddComponent<Transform>();
-	}
-
 	void Scene::OnUpdate()
 	{
 		// update transforms
@@ -31,7 +25,7 @@ namespace golem
 	{
 		GameObject e = { m_registry.create() };
 		e.AddComponent<TagComponent>((name.empty()) ? "Unnamed GameObject" : name);
-		e.AddComponent<Transform>().SetParent(&m_rootObj->GetComponent<Transform>());
+		e.AddComponent<Transform>();
 		return e;
 	}
 

@@ -34,12 +34,6 @@ namespace golem
 
 		template <typename T>
 		void RemoveComponent();
-
-		GameObject Parent();
-
-		bool ParentIsRoot();
-
-		GameObject Child(int index);
 	};
 
 	template <typename T>
