@@ -7,17 +7,19 @@
 
 namespace golem
 {
-
-	golem::Scene* Scene::g_workSpace;
-
 	Scene::Scene()
 	{
-
 	}
 
 	Scene::~Scene()
 	{
 		m_registry.clear();
+	}
+
+	void Scene::Init()
+	{
+		m_rootObj.reset(new GameObject(m_registry.create()));
+		m_rootObj->AddComponent<Transform>();
 	}
 
 	void Scene::OnUpdate()
@@ -29,7 +31,7 @@ namespace golem
 	{
 		GameObject e = { m_registry.create() };
 		e.AddComponent<TagComponent>((name.empty()) ? "Unnamed GameObject" : name);
-		e.AddComponent<Transform>();
+		e.AddComponent<Transform>().SetParent(&m_rootObj->GetComponent<Transform>());
 		return e;
 	}
 

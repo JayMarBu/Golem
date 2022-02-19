@@ -34,6 +34,12 @@ namespace golem
 
 		template <typename T>
 		void RemoveComponent();
+
+		GameObject Parent();
+
+		bool ParentIsRoot();
+
+		GameObject Child(int index);
 	};
 
 	template <typename T>
@@ -57,7 +63,9 @@ namespace golem
 	{
 		GOL_ASSERT(!HasComponent<T>(), "entity already has component of this type");
 
-		return Application::Get().GetScene()->m_registry.emplace<T>(m_id, args...);
+		T& comp = Application::Get().GetScene()->m_registry.emplace<T>(m_id, args...);
+
+		return comp;//Application::Get().GetScene()->m_registry.emplace<T>(m_id, args...);
 	}
 
 	template <typename T>

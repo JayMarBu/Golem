@@ -25,7 +25,7 @@ namespace golem
 		CreateDescriptors();
 		CreateRenderSystems();
 
-		m_gameObjectHierarchyEditor.SetScene(Application::Get().GetScene());
+		
 	}
 
 	EditorLayer::~EditorLayer()
@@ -231,6 +231,9 @@ namespace golem
 		auto& device = golem::Application::Get().GetDevice();
 
 		Application::Get().SetScene(new Scene());
+		m_gameObjectHierarchyEditor.SetScene(Application::Get().GetScene());
+
+		Application::Get().GetScene()->Init();
 
 		m_camera = GameObject::Create("Camera");
 		m_camera.AddComponent<Camera>();

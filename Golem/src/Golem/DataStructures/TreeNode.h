@@ -7,11 +7,29 @@ namespace golem
 	{
 		// Members ********************************************************************************
 	public:
+		TreeNode() = default;
+
+		T* Parent() {return parent;}
+
+		T* Child(int index) {return children[index];}
+		std::vector<T*> Children() {return children;}
+
+		void SetParent(T* p)
+		{
+			parent = p;
+			p->children.push_back(static_cast<T*>(this));
+		}
+
+		void SetChild(T* c)
+		{
+			children.push_back(c);
+			c->parent = static_cast<T*>(this);
+		}
+
+	protected:
 		T* parent = nullptr;
 		std::vector<T*> children;
 
-	protected:
-		TreeNode() = default;
 	};
 
 	template <typename T, typename...Args>

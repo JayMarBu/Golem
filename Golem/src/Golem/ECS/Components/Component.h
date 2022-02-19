@@ -14,6 +14,7 @@ namespace golem
 	protected:
 		Component() = default;
 	public:
+
 		REFLECT()
 	};
 }

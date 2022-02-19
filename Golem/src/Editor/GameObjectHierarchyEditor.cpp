@@ -61,8 +61,24 @@ namespace golem
 		ImGui::End();
 	}
 
-	void GameObjectHierarchyEditor::DrawGameObject(GameObject obj)
+	void GameObjectHierarchyEditor::DrawGameObject(GameObject obj, bool isRoot)
 	{
+		if(!obj.HasComponent<TagComponent>())
+			return;
+		
+		bool hasTransform = obj.HasComponent<Transform>();
+		bool isRootLevel = true;
+
+		if(hasTransform)
+		{
+			 isRootLevel = obj.ParentIsRoot();
+		}
+
+		if(isRoot && !isRootLevel)
+		{
+			return;
+		}
+
 		auto& tag = obj.GetComponent<TagComponent>().tag;
 
 		ImGuiTreeNodeFlags flags = ((m_selectedGameObject == obj) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
