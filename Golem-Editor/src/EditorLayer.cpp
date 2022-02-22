@@ -25,7 +25,33 @@ namespace golem
 		CreateDescriptors();
 		CreateRenderSystems();
 
-		
+		auto func = [](Grid* grid, int x, int y, int z) -> void {
+
+			if(grid->Get(x,y,z, grid->FrontBuffer()) == 1)
+			{
+				grid->Set(x,y,z,0);
+
+				// x
+				if (grid->ValidX(x - 1) && grid->Get(x - 1, y, z, grid->FrontBuffer()) == 0)
+					grid->Set(x - 1,y,z,1);
+
+				if (grid->ValidX(x + 1) && grid->Get(x + 1, y, z, grid->FrontBuffer()) == 0)
+					grid->Set(x + 1, y, z, 1);
+
+
+				// y
+				if (grid->ValidY(y - 1) && grid->Get(x, y - 1, z, grid->FrontBuffer()) == 0)
+					grid->Set(x, y - 1, z, 1);
+
+				if (grid->ValidY(y + 1) && grid->Get(x, y + 1, z, grid->FrontBuffer()) == 0)
+					grid->Set(x, y + 1, z, 1);
+			}
+		};
+
+		m_cellularAutomaton = CreateScope<CellularAutomaton>(CellularAutomaton::CellFunction(func), 4,4,2);
+
+		m_cellularAutomaton->GetGrid().Set(1,1,0, 1, m_cellularAutomaton->GetGrid().FrontBuffer());
+		m_cellularAutomaton->Dump();
 	}
 
 	EditorLayer::~EditorLayer()
@@ -140,6 +166,14 @@ namespace golem
 				Profiler::Record();
 			else
 				Profiler::End();
+		}
+
+		ImGui::Spacing();
+
+		if (ImGui::Button("Run & Dump"))
+		{
+			m_cellularAutomaton->RunSteps(1);
+			m_cellularAutomaton->Dump();
 		}
 
 		ImGui::End();

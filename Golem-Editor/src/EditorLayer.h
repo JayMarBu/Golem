@@ -14,6 +14,8 @@
 #include "Golem/Events/RenderSystemEvents.h"
 #include "Editor/GameObjectHierarchyEditor.h"
 
+#include "Cellular Automata/CellularAutomaton.h"
+
 namespace golem
 {
 	class GameObject;
@@ -45,6 +47,8 @@ namespace golem
 		Ref<RenderTexture> m_renderTexture;
 
 		GameObjectHierarchyEditor m_gameObjectHierarchyEditor;
+
+		Scope<CellularAutomaton> m_cellularAutomaton;
 
 		// Methods ********************************************************************************
 	public:
